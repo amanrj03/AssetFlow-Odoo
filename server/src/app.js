@@ -72,8 +72,8 @@ const maintenanceRoutes = require("./routes/maintenance.routes");
 app.use("/api/maintenance", maintenanceRoutes);
 
 // Audit
-// const auditRoutes = require("./routes/audit.routes");
-// app.use("/api/audits", auditRoutes);
+const auditRoutes = require("./routes/audit.routes");
+app.use("/api/audits", auditRoutes);
 
 // Reports
 // const reportRoutes = require("./routes/report.routes");
