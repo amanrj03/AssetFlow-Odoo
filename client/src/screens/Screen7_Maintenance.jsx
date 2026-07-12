@@ -72,7 +72,7 @@ export const Screen7_Maintenance = () => {
       <div className="page-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Screen 7: Maintenance Module</span>
+            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Maintenance Workflows & Repairs</span>
             <span className="badge badge-success" style={{ fontSize: "0.75rem" }}>Auto Asset Status Progression Active</span>
           </div>
           <h1 className="page-title" style={{ marginTop: "8px" }}>Asset Repair & Maintenance Hub</h1>

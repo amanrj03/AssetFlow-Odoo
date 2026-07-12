@@ -79,7 +79,7 @@ export const Screen6_Booking = () => {
       <div className="page-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Screen 6: Resource Booking</span>
+            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Shared Resource Bookings</span>
             <span className="badge badge-info" style={{ fontSize: "0.75rem" }}>SQL Check: existing.start &lt; new.end AND existing.end &gt; new.start</span>
           </div>
           <h1 className="page-title" style={{ marginTop: "8px" }}>Resource & Conference Room Reservations</h1>

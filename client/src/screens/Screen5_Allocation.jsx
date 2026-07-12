@@ -110,8 +110,8 @@ export const Screen5_Allocation = () => {
       <div className="page-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Screen 5: Allocation Module</span>
-            <span className="badge badge-danger" style={{ fontSize: "0.75rem" }}>MOST IMPORTANT BACKEND ENGINE</span>
+            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Allocations & Custody Transfers</span>
+            <span className="badge badge-info" style={{ fontSize: "0.75rem" }}>Live Custody Governance</span>
           </div>
           <h1 className="page-title" style={{ marginTop: "8px" }}>Asset Allocation, Transfer Requests & Returns</h1>
           <p className="page-subtitle">

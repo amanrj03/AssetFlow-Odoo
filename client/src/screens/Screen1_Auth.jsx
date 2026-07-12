@@ -129,7 +129,7 @@ export const Screen1_Auth = ({ onLaunchERP, setShowLanding }) => {
           <span style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 800, fontSize: "1.4rem", letterSpacing: "-0.03em", color: "var(--text-main)" }}>
             AssetFlow
           </span>
-          <span className="badge badge-coral" style={{ fontSize: "0.68rem" }}>Screen 1 Auth</span>
+          <span className="badge badge-coral" style={{ fontSize: "0.68rem" }}>Enterprise Auth</span>
         </div>
       </header>
 
@@ -139,7 +139,7 @@ export const Screen1_Auth = ({ onLaunchERP, setShowLanding }) => {
         <div style={{ paddingRight: "16px" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 16px", borderRadius: "99px", background: "rgba(224, 82, 48, 0.12)", border: "1px solid rgba(224, 82, 48, 0.35)", color: "var(--coral)", fontSize: "0.82rem", fontWeight: 700, marginBottom: "22px" }}>
             <Sparkles size={16} />
-            <span>SCREEN 1 • AUTHENTICATION & ROLE ARCHITECTURE</span>
+            <span>AUTHENTICATION & ROLE ARCHITECTURE</span>
           </div>
 
           <h1

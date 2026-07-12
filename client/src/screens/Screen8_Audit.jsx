@@ -134,7 +134,7 @@ export const Screen8_Audit = () => {
       <div className="page-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Screen 8: Audit Module</span>
+            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Physical Audits & Verification</span>
             <span className="badge badge-info" style={{ fontSize: "0.75rem" }}>POST/GET /audit-cycle</span>
           </div>
           <h1 className="page-title" style={{ marginTop: "8px" }}>Physical Audit Verification & Discrepancy Engine</h1>

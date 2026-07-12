@@ -128,7 +128,7 @@ export const Screen4_Assets = () => {
       <div className="page-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Screen 4: Asset Module</span>
+            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Asset Directory & Lifecycle</span>
             <span className="badge badge-info" style={{ fontSize: "0.75rem" }}>Tag format: AF-0001 (Auto-generated)</span>
           </div>
           <h1 className="page-title" style={{ marginTop: "8px" }}>Asset Inventory & Lifecycle Tracker</h1>

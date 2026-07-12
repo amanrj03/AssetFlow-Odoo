@@ -74,7 +74,7 @@ export const Screen10_Notifications = () => {
       <div className="page-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Screen 10: Notifications Module</span>
+            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>System Feed & Activity Logs</span>
             <span className="badge badge-success" style={{ fontSize: "0.75rem" }}>createActivityLog() Audit Trail</span>
           </div>
           <h1 className="page-title" style={{ marginTop: "8px" }}>Notification Center & System Activity Audit Logs</h1>
