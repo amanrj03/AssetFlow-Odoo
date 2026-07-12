@@ -48,11 +48,12 @@ async function main() {
   });
 
   console.log("🌱 Seeding users...");
+  // Admins
   const admin = await prisma.user.create({
     data: {
       email: "admin@assetflow.com",
       password: hashedPassword,
-      name: "Admin User",
+      name: "Vikram Malhotra",
       employeeCode: "EMP001",
       role: "ADMIN",
       status: "ACTIVE",
@@ -60,11 +61,24 @@ async function main() {
     },
   });
 
+  const admin2 = await prisma.user.create({
+    data: {
+      email: "admin2@assetflow.com",
+      password: hashedPassword,
+      name: "Aditya Roy",
+      employeeCode: "EMP005",
+      role: "ADMIN",
+      status: "ACTIVE",
+      departmentId: deptIT.id,
+    },
+  });
+
+  // Asset Managers
   const manager = await prisma.user.create({
     data: {
       email: "manager@assetflow.com",
       password: hashedPassword,
-      name: "Asset Manager User",
+      name: "Priya Sharma",
       employeeCode: "EMP002",
       role: "ASSET_MANAGER",
       status: "ACTIVE",
@@ -72,11 +86,24 @@ async function main() {
     },
   });
 
+  const manager2 = await prisma.user.create({
+    data: {
+      email: "manager2@assetflow.com",
+      password: hashedPassword,
+      name: "Aarav Singh",
+      employeeCode: "EMP006",
+      role: "ASSET_MANAGER",
+      status: "ACTIVE",
+      departmentId: deptIT.id,
+    },
+  });
+
+  // Department Heads
   const head = await prisma.user.create({
     data: {
       email: "head@assetflow.com",
       password: hashedPassword,
-      name: "IT Department Head",
+      name: "Dr. Rajesh K.",
       employeeCode: "EMP003",
       role: "DEPARTMENT_HEAD",
       status: "ACTIVE",
@@ -84,11 +111,24 @@ async function main() {
     },
   });
 
+  const head2 = await prisma.user.create({
+    data: {
+      email: "head2@assetflow.com",
+      password: hashedPassword,
+      name: "Meera Sen",
+      employeeCode: "EMP007",
+      role: "DEPARTMENT_HEAD",
+      status: "ACTIVE",
+      departmentId: deptHR.id,
+    },
+  });
+
+  // Employees
   const employee = await prisma.user.create({
     data: {
       email: "employee@assetflow.com",
       password: hashedPassword,
-      name: "Regular Employee User",
+      name: "Aman Verma",
       employeeCode: "EMP004",
       role: "EMPLOYEE",
       status: "ACTIVE",
@@ -96,9 +136,39 @@ async function main() {
     },
   });
 
+  const employee2 = await prisma.user.create({
+    data: {
+      email: "employee2@assetflow.com",
+      password: hashedPassword,
+      name: "Siddharth Roy",
+      employeeCode: "EMP008",
+      role: "EMPLOYEE",
+      status: "ACTIVE",
+      departmentId: deptIT.id,
+    },
+  });
+
+  const employee3 = await prisma.user.create({
+    data: {
+      email: "employee3@assetflow.com",
+      password: hashedPassword,
+      name: "Neha Gupta",
+      employeeCode: "EMP009",
+      role: "EMPLOYEE",
+      status: "ACTIVE",
+      departmentId: deptHR.id,
+    },
+  });
+
+  // Assign department heads
   await prisma.department.update({
     where: { id: deptIT.id },
     data: { headId: head.id },
+  });
+
+  await prisma.department.update({
+    where: { id: deptHR.id },
+    data: { headId: head2.id },
   });
 
   console.log("🌱 Seeding categories...");
