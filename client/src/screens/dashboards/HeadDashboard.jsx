@@ -5,7 +5,8 @@ import {
   Box,
   Repeat,
   Building2,
-  Users
+  Users,
+  Wrench
 } from "lucide-react";
 
 export const HeadDashboard = ({ dashboardData, setActiveTab }) => {
