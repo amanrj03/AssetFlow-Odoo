@@ -85,7 +85,7 @@ export const Screen0_Landing = ({ onLaunchERP }) => {
     {
       title: "Can I generate real-time QR tags and custom metadata fields?",
       content:
-        "Absolutely. Screen 4 (Asset Inventory) allows administrators to assign custom JSONB metadata fields (`ram: 32GB`, `chip: M3 Max`) and instantly generate downloadable QR badges (`AF-0001`) that link directly to physical custody verification.",
+        "Absolutely. The Asset Inventory module allows administrators to assign custom JSONB metadata fields (`ram: 32GB`, `chip: M3 Max`) and instantly generate downloadable QR badges (`AF-0001`) that link directly to physical custody verification.",
     },
   ];
 
@@ -266,13 +266,13 @@ export const Screen0_Landing = ({ onLaunchERP }) => {
             <button className="insighthub-circle-btn" title="Dashboard Summary" onClick={() => onLaunchERP && onLaunchERP("dashboard")}>
               <BarChart3 size={20} />
             </button>
-            <button className="insighthub-circle-btn" title="Screen 5: Allocation Guard" onClick={() => setActiveSandboxTab("allocation")}>
+            <button className="insighthub-circle-btn" title="Allocations & Transfers Guard" onClick={() => setActiveSandboxTab("allocation")}>
               <Repeat size={20} />
             </button>
-            <button className="insighthub-circle-btn" title="Screen 6: SQL Overlap Engine" onClick={() => setActiveSandboxTab("booking")}>
+            <button className="insighthub-circle-btn" title="Resource Booking Overlap Engine" onClick={() => setActiveSandboxTab("booking")}>
               <Calendar size={20} />
             </button>
-            <button className="insighthub-circle-btn" title="Screen 8: Audit Discrepancy" onClick={() => onLaunchERP && onLaunchERP("audit")}>
+            <button className="insighthub-circle-btn" title="Physical Audit & Discrepancy" onClick={() => onLaunchERP && onLaunchERP("audit")}>
               <ShieldCheck size={20} />
             </button>
           </div>
@@ -283,7 +283,7 @@ export const Screen0_Landing = ({ onLaunchERP }) => {
               <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "var(--coral)", color: "white", display: "flex", alignItems: "center", justify: "center", fontWeight: 800 }}>📈</div>
               <div>
                 <div style={{ fontWeight: 800, fontSize: "0.95rem" }}>Graphs & Valuation</div>
-                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>BI Reports • Screen 9</div>
+                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>BI & Analytics Reports</div>
               </div>
             </div>
             <div style={{ height: "180px", background: "rgba(241, 245, 249, 0.8)", borderRadius: "16px", padding: "16px", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
@@ -565,7 +565,7 @@ export const Screen0_Landing = ({ onLaunchERP }) => {
       </section>
 
       {/* ============================================================================================== */}
-      {/* 5. 4 HACKATHON RUBRIC REQUIREMENT CARDS (`Verify in Screen X`) */}
+      {/* 5. CORE ARCHITECTURAL & EVALUATION REQUIREMENTS */}
       {/* ============================================================================================== */}
       <section id="rubric" style={{ padding: "80px 40px", maxWidth: "1480px", margin: "0 auto", textAlign: "center", position: "relative", zIndex: 10 }}>
         <h2 style={{ fontFamily: "'Outfit', sans-serif", fontSize: "3rem", fontWeight: 800, color: "var(--text-main)", letterSpacing: "-0.03em", marginBottom: "16px" }}>
@@ -585,7 +585,7 @@ export const Screen0_Landing = ({ onLaunchERP }) => {
               </p>
             </div>
             <button onClick={() => onLaunchERP && onLaunchERP("allocation")} className="btn btn-dark" style={{ padding: "14px 24px", borderRadius: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", fontWeight: 700, fontSize: "0.9rem" }}>
-              <span>Verify in Screen 5 (Allocations & Transfers)</span><ArrowRight size={18} />
+              <span>Explore Allocations & Transfers Module</span><ArrowRight size={18} />
             </button>
           </div>
 
@@ -598,7 +598,7 @@ export const Screen0_Landing = ({ onLaunchERP }) => {
               </p>
             </div>
             <button onClick={() => onLaunchERP && onLaunchERP("booking")} className="btn btn-dark" style={{ padding: "14px 24px", borderRadius: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", fontWeight: 700, fontSize: "0.9rem" }}>
-              <span>Verify in Screen 6 (Resource Booking Heatmap)</span><ArrowRight size={18} />
+              <span>Explore Resource Booking Overlap Engine</span><ArrowRight size={18} />
             </button>
           </div>
 
@@ -611,7 +611,7 @@ export const Screen0_Landing = ({ onLaunchERP }) => {
               </p>
             </div>
             <button onClick={() => onLaunchERP && onLaunchERP("org")} className="btn btn-secondary" style={{ padding: "14px 24px", borderRadius: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", fontWeight: 700, fontSize: "0.9rem", background: "#F8FAFC" }}>
-              <span>Verify in Screen 3 (Hierarchical Directory)</span><ArrowRight size={18} />
+              <span>Explore Hierarchical Directory & RBAC</span><ArrowRight size={18} />
             </button>
           </div>
 
@@ -624,7 +624,7 @@ export const Screen0_Landing = ({ onLaunchERP }) => {
               </p>
             </div>
             <button onClick={() => onLaunchERP && onLaunchERP("audit")} className="btn btn-secondary" style={{ padding: "14px 24px", borderRadius: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", fontWeight: 700, fontSize: "0.9rem", background: "#F8FAFC" }}>
-              <span>Verify in Screen 8 (Audit & Discrepancy)</span><ArrowRight size={18} />
+              <span>Explore Audit & Discrepancy Engine</span><ArrowRight size={18} />
             </button>
           </div>
         </div>
@@ -658,15 +658,15 @@ export const Screen0_Landing = ({ onLaunchERP }) => {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px", textAlign: "left" }}>
           {[
-            { id: "dashboard", num: "Screen 2", title: "Executive Dashboard", icon: LayoutGrid, desc: "Real-time bento summary across valuations, active assets, audit countdown, and wallet verification." },
-            { id: "org", num: "Screen 3", title: "Org Architecture & RBAC", icon: Building2, desc: "Hierarchical departments, custom metadata schemas (`ram: 32GB`), and 4-tier employee role matrix." },
-            { id: "assets", num: "Screen 4", title: "Asset Inventory & Tag QR", icon: Box, desc: "Master asset directory with QR badge generator, category filtration, and detailed custody logs." },
-            { id: "allocation", num: "Screen 5", title: "Allocation & Transfer Engine", icon: Repeat, desc: "Enforces `Already allocated` rejection and routes transfer requests (`Employee → Head → Admin`)." },
-            { id: "booking", num: "Screen 6", title: "Resource Booking Heatmap", icon: Calendar, desc: "Executes non-locking exclusion query `SELECT * FROM bookings WHERE start < $3 AND end > $2`." },
-            { id: "maintenance", num: "Screen 7", title: "Maintenance Ticket Lifecycle", icon: Wrench, desc: "Track repairs (`Pending → In Progress → Resolved`), log repair costs, and assign technicians." },
-            { id: "audit", num: "Screen 8", title: "Discrepancy & Audit Engine", icon: ShieldCheck, desc: "Physical vs system count validation, discrepancy flagging, and retirement status tracking." },
-            { id: "reports", num: "Screen 9", title: "BI & Analytics Reports", icon: BarChart3, desc: "Department allocation rates, category value breakdown, asset turnover, and 1-click CSV export." },
-            { id: "notifications", num: "Screen 10", title: "Notifications & System Logs", icon: BellRing, desc: "Real-time unread alerts paired with immutable JSON `createActivityLog()` event history." },
+            { id: "dashboard", num: "Overview", title: "Executive Dashboard", icon: LayoutGrid, desc: "Real-time bento summary across valuations, active assets, audit countdown, and wallet verification." },
+            { id: "org", num: "Directory", title: "Org Architecture & RBAC", icon: Building2, desc: "Hierarchical departments, custom metadata schemas (`ram: 32GB`), and 4-tier employee role matrix." },
+            { id: "assets", num: "Inventory", title: "Asset Inventory & Tag QR", icon: Box, desc: "Master asset directory with QR badge generator, category filtration, and detailed custody logs." },
+            { id: "allocation", num: "Operations", title: "Allocation & Transfer Engine", icon: Repeat, desc: "Enforces `Already allocated` rejection and routes transfer requests (`Employee → Head → Admin`)." },
+            { id: "booking", num: "Schedule", title: "Resource Booking Heatmap", icon: Calendar, desc: "Executes non-locking exclusion query `SELECT * FROM bookings WHERE start < $3 AND end > $2`." },
+            { id: "maintenance", num: "Workflows", title: "Maintenance Ticket Lifecycle", icon: Wrench, desc: "Track repairs (`Pending → In Progress → Resolved`), log repair costs, and assign technicians." },
+            { id: "audit", num: "Auditing", title: "Discrepancy & Audit Engine", icon: ShieldCheck, desc: "Physical vs system count validation, discrepancy flagging, and retirement status tracking." },
+            { id: "reports", num: "Analytics", title: "BI & Analytics Reports", icon: BarChart3, desc: "Department allocation rates, category value breakdown, asset turnover, and 1-click CSV export." },
+            { id: "notifications", num: "Activity", title: "Notifications & System Logs", icon: BellRing, desc: "Real-time unread alerts paired with immutable JSON `createActivityLog()` event history." },
           ].map((mod) => (
             <div key={mod.id} className="aceternity-hover-card" style={{ padding: "28px", display: "flex", flexDirection: "column", justifyContent: "space-between", cursor: "pointer" }} onClick={() => onLaunchERP && onLaunchERP(mod.id)}>
               <div>
