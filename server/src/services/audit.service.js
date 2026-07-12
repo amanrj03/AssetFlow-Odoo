@@ -269,7 +269,7 @@ const verifyAsset = async (id, data, userId, userRole) => {
         userId: cycle.createdById,
         title: "Discrepancy Found",
         message: `Asset ${auditItem.asset.assetTag} found ${result.toLowerCase()} during cycle "${cycle.title}".`,
-        type: "DISCREPANCY_FOUND",
+        type: "AUDIT_CREATED",
       },
     });
   }
@@ -328,7 +328,7 @@ const closeAuditCycle = async (id, adminUserId) => {
       userId: cycle.createdById,
       title: "Audit Cycle Closed",
       message: `Audit cycle "${cycle.title}" has been successfully closed.`,
-      type: "AUDIT_CLOSED",
+      type: "AUDIT_COMPLETED",
     },
   });
 

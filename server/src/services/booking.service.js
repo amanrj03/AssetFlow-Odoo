@@ -153,7 +153,7 @@ const createBooking = async (data, creatorId) => {
       userId: creatorId,
       title: "Booking Confirmed",
       message: `Your booking for ${booking.asset.name} (${booking.asset.assetTag}) has been confirmed from ${startTime.toLocaleString()} to ${endTime.toLocaleString()}.`,
-      type: "BOOKING_CONFIRMED",
+      type: "BOOKING_CREATED",
     },
   });
 
@@ -233,7 +233,7 @@ const rescheduleBooking = async (id, data, userId, userRole) => {
       userId: booking.bookedById,
       title: "Booking Rescheduled",
       message: `Your booking for resource ${booking.asset.name} has been rescheduled to: ${startTime.toLocaleString()} - ${endTime.toLocaleString()}.`,
-      type: "BOOKING_RESCHEDULED",
+      type: "BOOKING_CREATED",
     },
   });
 

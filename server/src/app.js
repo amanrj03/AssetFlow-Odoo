@@ -75,13 +75,21 @@ app.use("/api/maintenance", maintenanceRoutes);
 const auditRoutes = require("./routes/audit.routes");
 app.use("/api/audits", auditRoutes);
 
+// Activity Logs
+const activityLogRoutes = require("./routes/activityLog.routes");
+app.use("/api/activity-logs", activityLogRoutes);
+
+// Dashboard
+const dashboardRoutes = require("./routes/dashboard.routes");
+app.use("/api/dashboard", dashboardRoutes);
+
 // Reports
-// const reportRoutes = require("./routes/report.routes");
-// app.use("/api/reports", reportRoutes);
+const reportRoutes = require("./routes/report.routes");
+app.use("/api/reports", reportRoutes);
 
 // Notifications
-// const notificationRoutes = require("./routes/notification.routes");
-// app.use("/api/notifications", notificationRoutes);
+const notificationRoutes = require("./routes/notification.routes");
+app.use("/api/notifications", notificationRoutes);
 
 /*
 |--------------------------------------------------------------------------
