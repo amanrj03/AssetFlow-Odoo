@@ -68,8 +68,8 @@ const bookingRoutes = require("./routes/booking.routes");
 app.use("/api/bookings", bookingRoutes);
 
 // Maintenance
-// const maintenanceRoutes = require("./routes/maintenance.routes");
-// app.use("/api/maintenance", maintenanceRoutes);
+const maintenanceRoutes = require("./routes/maintenance.routes");
+app.use("/api/maintenance", maintenanceRoutes);
 
 // Audit
 // const auditRoutes = require("./routes/audit.routes");
