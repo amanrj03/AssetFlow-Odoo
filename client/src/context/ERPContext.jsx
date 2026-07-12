@@ -36,7 +36,23 @@ export const ERPProvider = ({ children }) => {
     try {
       const res = await api.getCategories();
       if (res && res.success && res.data) {
-        setCategories(res.data.categories || res.data);
+        const rawCats = res.data.categories || res.data;
+        const mapped = rawCats.map((c) => {
+          let fields = {};
+          if (c.customFields) {
+            try {
+              fields = typeof c.customFields === "string" ? JSON.parse(c.customFields) : c.customFields;
+            } catch (e) {
+              fields = {};
+            }
+          }
+          return {
+            ...c,
+            code: fields.code || c.name.substring(0, 4).toUpperCase(),
+            metadataSchema: fields.metadataSchema || [],
+          };
+        });
+        setCategories(mapped);
       }
     } catch (e) {
       console.error("fetchCategories error:", e);
@@ -177,7 +193,15 @@ export const ERPProvider = ({ children }) => {
   };
 
   const createCategory = async (catData) => {
-    const res = await api.createCategory(catData);
+    const payload = {
+      name: catData.name,
+      description: catData.description || `Custom category: ${catData.name}`,
+      customFields: {
+        code: catData.code,
+        metadataSchema: catData.metadataSchema,
+      },
+    };
+    const res = await api.createCategory(payload);
     if (res && res.success) {
       await fetchCategories();
     }
