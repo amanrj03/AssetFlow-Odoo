@@ -1,7 +1,7 @@
 const prisma = require("../config/db");
-const generateAssetTag = require("./generateAssetTag");
-const generateQRCode = require("./generateQRCode");
-const { uploadBuffer } = require("./cloudinaryUpload");
+const generateAssetTag = require("../utils/generateAssetTag");
+const generateQRCode = require("../utils/generateQRCode");
+const { uploadBuffer } = require("../utils/cloudinaryUpload");
 
 const getAssets = async ({ search, status, categoryId, departmentId, page = 1, limit = 10, sort }) => {
   const skip = (page - 1) * limit;
