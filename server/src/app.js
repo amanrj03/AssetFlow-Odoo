@@ -4,13 +4,6 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
-/*
-|--------------------------------------------------------------------------
-| Global Middlewares
-|--------------------------------------------------------------------------
-*/
-
-// Enable CORS
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "localhost",
@@ -27,11 +20,6 @@ app.use(express.urlencoded({ extended: true }));
 // Parse Cookies
 app.use(cookieParser());
 
-/*
-|--------------------------------------------------------------------------
-| Health Check Route
-|--------------------------------------------------------------------------
-*/
 
 app.get("/", (req, res) => {
   res.status(200).json({
