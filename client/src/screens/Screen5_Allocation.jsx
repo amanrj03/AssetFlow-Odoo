@@ -22,11 +22,18 @@ export const Screen5_Allocation = () => {
   const {
     assets,
     transferRequests,
+    fetchTransferRequests,
+    fetchAssets,
     processTransferRequest,
     allocateAsset,
     requestTransfer,
     returnAsset,
   } = useERP();
+
+  React.useEffect(() => {
+    fetchTransferRequests();
+    fetchAssets();
+  }, []);
 
   const [activeTab, setActiveTab] = useState("transfers"); // "transfers" | "direct" | "returns"
   
@@ -53,22 +60,21 @@ export const Screen5_Allocation = () => {
 
   const canApprove = user?.role === "ADMIN" || user?.role === "ASSET_MANAGER" || user?.role === "DEPARTMENT_HEAD";
 
-  const handleDirectAllocation = (e) => {
+  const handleDirectAllocation = async (e) => {
     e.preventDefault();
     setAllocError(null);
     setAllocSuccess(null);
 
     if (!selectedAssetId) return;
 
-    const result = allocateAsset(selectedAssetId, targetUser, targetDept, allocNotes);
-    if (!result.success) {
-      // "If Asset Status = Allocated -> Reject. Response: { message: "Already allocated" }"
+    const result = await allocateAsset(selectedAssetId, targetUser, new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), allocNotes);
+    if (result && !result.success) {
       setAllocError({
         message: result.message || "Already allocated",
         assetId: selectedAssetId,
       });
-    } else {
-      setAllocSuccess(result.message);
+    } else if (result) {
+      setAllocSuccess(result.message || "Asset allocated successfully");
     }
   };
 
@@ -78,10 +84,10 @@ export const Screen5_Allocation = () => {
     setShowTransferModal(true);
   };
 
-  const handleTransferSubmit = (e) => {
+  const handleTransferSubmit = async (e) => {
     e.preventDefault();
     if (!transferAssetId || !transferTo) return;
-    requestTransfer({
+    await requestTransfer({
       assetId: transferAssetId,
       from: transferFrom,
       to: transferTo,
@@ -92,10 +98,10 @@ export const Screen5_Allocation = () => {
     setAllocError(null);
   };
 
-  const handleReturnSubmit = (e) => {
+  const handleReturnSubmit = async (e) => {
     e.preventDefault();
     if (!returnAssetId) return;
-    returnAsset({
+    await returnAsset({
       assetId: returnAssetId,
       condition: returnCondition,
       notes: returnNotes,
@@ -110,7 +116,7 @@ export const Screen5_Allocation = () => {
       <div className="page-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Screen 5: Allocation Module</span>
+            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Allocation & Transfer Engine</span>
             <span className="badge badge-danger" style={{ fontSize: "0.75rem" }}>MOST IMPORTANT BACKEND ENGINE</span>
           </div>
           <h1 className="page-title" style={{ marginTop: "8px" }}>Asset Allocation, Transfer Requests & Returns</h1>

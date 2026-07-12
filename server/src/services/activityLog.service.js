@@ -1,6 +1,6 @@
 const prisma = require("../config/db");
 
-const getActivityLogs = async ({ userId, action, entity, page = 1, limit = 10 }) => {
+const getActivityLogs = async ({ userId, departmentId, action, entity, page = 1, limit = 10 }) => {
   const skip = (page - 1) * limit;
   const take = parseInt(limit);
 
@@ -9,6 +9,11 @@ const getActivityLogs = async ({ userId, action, entity, page = 1, limit = 10 })
   if (userId) where.userId = userId;
   if (action) where.action = action;
   if (entity) where.entity = entity;
+  if (departmentId) {
+    where.user = {
+      departmentId: departmentId
+    };
+  }
 
   const [total, logs] = await prisma.$transaction([
     prisma.activityLog.count({ where }),

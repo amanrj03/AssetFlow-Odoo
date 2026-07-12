@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 
 export const Navbar = ({ activeTab, setActiveTab, sidebarCollapsed, setSidebarCollapsed, setShowLanding }) => {
-  const { user, switchRole, demoUsersList, theme, toggleTheme } = useAuth();
+  const { user, logout, theme, toggleTheme } = useAuth();
   const { notifications, markNotificationRead, markAllNotificationsRead, assets } = useERP();
 
   const [showRoleMenu, setShowRoleMenu] = useState(false);
@@ -32,11 +32,6 @@ export const Navbar = ({ activeTab, setActiveTab, sidebarCollapsed, setSidebarCo
   const [showSearchResults, setShowSearchResults] = useState(false);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
-
-  const handleRoleSelect = (roleKey) => {
-    switchRole(roleKey);
-    setShowRoleMenu(false);
-  };
 
   const filteredSearchAssets = searchQuery.trim()
     ? assets.filter(
@@ -143,7 +138,7 @@ export const Navbar = ({ activeTab, setActiveTab, sidebarCollapsed, setSidebarCo
               </div>
             </div>
 
-            {/* Role Switcher Dropdown */}
+            {/* User Dropdown */}
             {showRoleMenu && (
               <div
                 style={{
@@ -155,40 +150,48 @@ export const Navbar = ({ activeTab, setActiveTab, sidebarCollapsed, setSidebarCo
                   border: "1px solid var(--border-color)",
                   borderRadius: "var(--radius-md)",
                   boxShadow: "var(--shadow-lg)",
-                  padding: "8px",
+                  padding: "16px",
                   zIndex: 200,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
                 }}
               >
-                <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--text-muted)", padding: "6px 10px", textTransform: "uppercase" }}>
-                  Switch Test Role (`Dwayne Tatum`)
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: "0.9rem", color: "var(--text-main)" }}>
+                    {user?.name}
+                  </div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "2px" }}>
+                    {user?.email}
+                  </div>
                 </div>
-                {Object.keys(demoUsersList).map((roleKey) => {
-                  const u = demoUsersList[roleKey];
-                  return (
-                    <button
-                      key={roleKey}
-                      onClick={() => handleRoleSelect(roleKey)}
-                      style={{
-                        width: "100%",
-                        padding: "10px",
-                        borderRadius: "var(--radius-sm)",
-                        border: "none",
-                        background: user?.role === roleKey ? "var(--bg-peach-light)" : "transparent",
-                        textAlign: "left",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <div>
-                        <div style={{ fontWeight: 700, fontSize: "0.85rem", color: "var(--text-main)" }}>{roleKey}</div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>{u.name}</div>
-                      </div>
-                      {user?.role === roleKey && <span style={{ color: "var(--coral)", fontWeight: 800 }}>✓</span>}
-                    </button>
-                  );
-                })}
+
+                <div style={{ borderTop: "1px solid var(--border-subtle)", padding: "10px 0" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600 }}>Active Role</span>
+                    <span className="badge badge-coral" style={{ fontSize: "0.7rem", fontWeight: 800 }}>
+                      {user?.role}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    logout();
+                    setShowRoleMenu(false);
+                  }}
+                  className="btn btn-dark"
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    fontWeight: 700,
+                    fontSize: "0.8rem",
+                    textAlign: "center",
+                  }}
+                >
+                  Sign Out of Session
+                </button>
               </div>
             )}
           </div>

@@ -1,3 +1,4 @@
+const prisma = require("../config/db");
 const auditService = require("../services/audit.service");
 const {
   createAuditCycleSchema,
@@ -6,6 +7,8 @@ const {
 } = require("../validators/audit.validator");
 const { sendSuccess } = require("../utils/response");
 const asyncHandler = require("../utils/asyncHandler");
+
+const isUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
 
 const getAuditCycles = asyncHandler(async (req, res) => {
   const { page, limit } = req.query;
@@ -45,7 +48,28 @@ const assignAuditor = asyncHandler(async (req, res) => {
 
 const verifyAsset = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const parsedData = verifyAssetSchema.parse(req.body);
+
+  let assetId = req.body.assetId;
+  if (assetId && !isUUID(assetId)) {
+    const assetObj = await prisma.asset.findFirst({
+      where: { assetTag: assetId }
+    });
+    assetId = assetObj ? assetObj.id : null;
+  }
+
+  let resultVal = req.body.result || req.body.verification;
+  if (resultVal) {
+    resultVal = resultVal.toUpperCase();
+    if (resultVal === "PENDING") resultVal = "MISSING";
+  }
+
+  const resolvedBody = {
+    assetId,
+    result: resultVal || "VERIFIED",
+    remarks: req.body.remarks || req.body.notes || ""
+  };
+
+  const parsedData = verifyAssetSchema.parse(resolvedBody);
   const item = await auditService.verifyAsset(id, parsedData, req.user.id, req.user.role);
   return sendSuccess(res, "Asset verification recorded successfully", { item });
 });

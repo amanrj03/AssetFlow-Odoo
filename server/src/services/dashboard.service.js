@@ -23,6 +23,9 @@ const getAdminDashboard = async (userId) => {
     notifications,
     maintenanceRequests,
     bookingsToday,
+    totalDepartments,
+    totalEmployees,
+    activeAudits,
   ] = await prisma.$transaction([
     prisma.asset.count({ where: { status: "AVAILABLE" } }),
     prisma.asset.count({ where: { status: "ALLOCATED" } }),
@@ -60,6 +63,9 @@ const getAdminDashboard = async (userId) => {
       orderBy: { startTime: "asc" },
       include: { asset: { select: { name: true, assetTag: true } } },
     }),
+    prisma.department.count(),
+    prisma.user.count(),
+    prisma.auditCycle.count({ where: { status: "ACTIVE" } }),
   ]);
 
   return {
@@ -74,6 +80,9 @@ const getAdminDashboard = async (userId) => {
       pendingTransfers,
       upcomingReturns,
       overdueReturns,
+      totalDepartments,
+      totalEmployees,
+      activeAudits,
     },
     recentActivities: recentActivities.map((log) => ({
       id: log.id,
@@ -202,7 +211,7 @@ const getDepartmentDashboard = async (userId) => {
 
   if (!departmentId) {
     return {
-      kpis: { departmentAssets: 0, departmentEmployees: 0, departmentBookings: 0, activeAllocations: 0 },
+      kpis: { departmentAssets: 0, departmentEmployees: 0, departmentBookings: 0, activeAllocations: 0, departmentMaintenance: 0 },
       recentActivities: [],
       notifications: [],
       departmentAssetsList: [],
@@ -219,6 +228,7 @@ const getDepartmentDashboard = async (userId) => {
     notifications,
     departmentAssetsList,
     bookingsToday,
+    departmentMaintenance,
   ] = await prisma.$transaction([
     prisma.asset.count({ where: { departmentId } }),
     prisma.user.count({ where: { departmentId } }),
@@ -258,6 +268,12 @@ const getDepartmentDashboard = async (userId) => {
       orderBy: { startTime: "asc" },
       include: { asset: { select: { name: true, assetTag: true } } },
     }),
+    prisma.maintenanceRequest.count({
+      where: {
+        status: { notIn: ["RESOLVED", "REJECTED"] },
+        asset: { departmentId },
+      },
+    }),
   ]);
 
   return {
@@ -266,6 +282,7 @@ const getDepartmentDashboard = async (userId) => {
       departmentEmployees,
       departmentBookings,
       activeAllocations,
+      departmentMaintenance,
     },
     recentActivities: recentActivities.map((log) => ({
       id: log.id,

@@ -17,7 +17,19 @@ import {
 
 export const Screen7_Maintenance = () => {
   const { user } = useAuth();
-  const { maintenances, assets, raiseMaintenance, updateMaintenanceStatus } = useERP();
+  const {
+    maintenances,
+    assets,
+    fetchMaintenances,
+    fetchAssets,
+    raiseMaintenance,
+    updateMaintenanceStatus
+  } = useERP();
+
+  React.useEffect(() => {
+    fetchMaintenances();
+    fetchAssets();
+  }, []);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedAssetId, setSelectedAssetId] = useState("");
@@ -31,19 +43,35 @@ export const Screen7_Maintenance = () => {
 
   const canApproveOrAssign = user?.role === "ADMIN" || user?.role === "ASSET_MANAGER";
 
-  const handleRaiseSubmit = (e) => {
+  const handleRaiseSubmit = async (e) => {
     e.preventDefault();
     if (!selectedAssetId || !description) return;
-    raiseMaintenance({ assetId: selectedAssetId, description, priority });
-    setShowAddModal(false);
-    setDescription("Battery capacity degraded below 75%, thermal fan throttling");
+    try {
+      const res = await raiseMaintenance({ assetId: selectedAssetId, description, priority });
+      if (res && res.success) {
+        setShowAddModal(false);
+        setDescription("Battery capacity degraded below 75%, thermal fan throttling");
+      } else {
+        alert(res?.message || "Failed to raise maintenance request");
+      }
+    } catch (err) {
+      alert(err.message || "An error occurred");
+    }
   };
 
-  const handleAssignSubmit = (e) => {
+  const handleAssignSubmit = async (e) => {
     e.preventDefault();
     if (!assignTicketId || !techName) return;
-    updateMaintenanceStatus(assignTicketId, "Technician Assigned", techName);
-    setShowAssignModal(false);
+    try {
+      const res = await updateMaintenanceStatus(assignTicketId, "Technician Assigned", techName);
+      if (res && res.success) {
+        setShowAssignModal(false);
+      } else {
+        alert(res?.message || "Failed to assign technician");
+      }
+    } catch (err) {
+      alert(err.message || "An error occurred");
+    }
   };
 
   const getPriorityBadge = (prio) => {
@@ -72,7 +100,7 @@ export const Screen7_Maintenance = () => {
       <div className="page-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Screen 7: Maintenance Module</span>
+            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Maintenance & Repairs</span>
             <span className="badge badge-success" style={{ fontSize: "0.75rem" }}>Auto Asset Status Progression Active</span>
           </div>
           <h1 className="page-title" style={{ marginTop: "8px" }}>Asset Repair & Maintenance Hub</h1>
@@ -132,18 +160,18 @@ export const Screen7_Maintenance = () => {
               <tr key={m.id}>
                 <td>
                   <span style={{ fontFamily: "Fira Code", fontWeight: 700, color: "var(--primary)", fontSize: "0.82rem" }}>
-                    {m.assetTag}
+                    {m.asset?.assetTag || m.assetTag}
                   </span>
                   <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: "2px" }}>ID: {m.id}</div>
                 </td>
-                <td style={{ fontWeight: 600, color: "var(--text-main)" }}>{m.assetName}</td>
-                <td style={{ fontSize: "0.88rem", maxWidth: "280px" }}>{m.description}</td>
+                <td style={{ fontWeight: 600, color: "var(--text-main)" }}>{m.asset?.name || m.assetName}</td>
+                <td style={{ fontSize: "0.88rem", maxWidth: "280px" }}>{m.issue || m.description}</td>
                 <td><span className={`badge ${getPriorityBadge(m.priority)}`}>{m.priority}</span></td>
                 <td>
                   <div style={{ fontWeight: 600, fontSize: "0.88rem", color: m.technician ? "var(--purple)" : "var(--text-muted)" }}>
                     {m.technician || "(Unassigned)"}
                   </div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginTop: "2px" }}>Raised by: {m.raisedBy}</div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginTop: "2px" }}>Raised by: {m.raisedBy?.name || m.raisedBy || "System"}</div>
                 </td>
                 <td>
                   <span className={`badge ${getStatusBadge(m.status)}`}>{m.status}</span>

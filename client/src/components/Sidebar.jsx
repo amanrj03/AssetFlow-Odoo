@@ -17,18 +17,20 @@ export const Sidebar = ({ activeTab, setActiveTab, sidebarCollapsed }) => {
   const { user } = useAuth();
   const role = user?.role || "EMPLOYEE";
 
-  // Navigation Items matching the Core Modules
+  // Navigation Items matching the Core Modules with role restrictions
   const navItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, screen: "Screen 2", badge: "Overview" },
-    { id: "org", label: "Organization Setup", icon: Building2, screen: "Screen 3", badge: role === "ADMIN" ? "Admin Only" : "Directory" },
-    { id: "assets", label: "Asset Module", icon: Box, screen: "Screen 4", badge: "Tag: AF-xxxx" },
-    { id: "allocation", label: "Allocations & Transfers", icon: Repeat, screen: "Screen 5", badge: "Core Engine", highlight: true },
-    { id: "booking", label: "Resource Booking", icon: Calendar, screen: "Screen 6", badge: "SQL Check" },
-    { id: "maintenance", label: "Maintenance Tickets", icon: Wrench, screen: "Screen 7", badge: "Workflow" },
-    { id: "audit", label: "Audit Management", icon: ShieldCheck, screen: "Screen 8", badge: "Discrepancy" },
-    { id: "reports", label: "Analytics & Reports", icon: BarChart3, screen: "Screen 9", badge: "Depreciation" },
-    { id: "notifications", label: "Activity Logs & Feed", icon: Terminal, screen: "Screen 10", badge: "Audit Trail" },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, badge: "Overview", roles: ["ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD", "EMPLOYEE"] },
+    { id: "org", label: "Organization Setup", icon: Building2, badge: role === "ADMIN" ? "Admin Only" : "Directory", roles: ["ADMIN"] },
+    { id: "assets", label: "Asset Module", icon: Box, badge: "Tag: AF-xxxx", roles: ["ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD", "EMPLOYEE"] },
+    { id: "allocation", label: "Allocations & Transfers", icon: Repeat, badge: "Core Engine", highlight: true, roles: ["ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD", "EMPLOYEE"] },
+    { id: "booking", label: "Resource Booking", icon: Calendar, badge: "SQL Check", roles: ["ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD", "EMPLOYEE"] },
+    { id: "maintenance", label: "Maintenance Tickets", icon: Wrench, badge: "Workflow", roles: ["ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD", "EMPLOYEE"] },
+    { id: "audit", label: "Audit Management", icon: ShieldCheck, badge: "Discrepancy", roles: ["ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD"] },
+    { id: "reports", label: "Analytics & Reports", icon: BarChart3, badge: "Depreciation", roles: ["ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD"] },
+    { id: "notifications", label: "Activity Logs & Feed", icon: Terminal, badge: "Audit Trail", roles: ["ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD", "EMPLOYEE"] },
   ];
+
+  const visibleNavItems = navItems.filter(item => item.roles.includes(role));
 
   // When collapsed, hide the left sidebar completely so the main page gets 100% of the screen width with ZERO overlaps!
   if (sidebarCollapsed) {
@@ -94,7 +96,7 @@ export const Sidebar = ({ activeTab, setActiveTab, sidebarCollapsed }) => {
           MODULES ({role})
         </div>
 
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
           return (

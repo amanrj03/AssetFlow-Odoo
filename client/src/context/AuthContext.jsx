@@ -7,7 +7,7 @@ const INITIAL_DEMO_USERS = {
   ADMIN: {
     id: "usr-admin-01",
     name: "Vikram Malhotra",
-    email: "admin@assetflow.enterprise",
+    email: "admin@assetflow.com",
     role: "ADMIN",
     department: "Executive & Admin",
     status: "ACTIVE",
@@ -17,7 +17,7 @@ const INITIAL_DEMO_USERS = {
   ASSET_MANAGER: {
     id: "usr-am-02",
     name: "Priya Sharma",
-    email: "priya.asset@assetflow.enterprise",
+    email: "manager@assetflow.com",
     role: "ASSET_MANAGER",
     department: "Logistics & Procurement",
     status: "ACTIVE",
@@ -27,7 +27,7 @@ const INITIAL_DEMO_USERS = {
   DEPARTMENT_HEAD: {
     id: "usr-dh-03",
     name: "Dr. Rajesh K.",
-    email: "rajesh.head@assetflow.enterprise",
+    email: "head@assetflow.com",
     role: "DEPARTMENT_HEAD",
     department: "R&D & Engineering",
     status: "ACTIVE",
@@ -37,7 +37,7 @@ const INITIAL_DEMO_USERS = {
   EMPLOYEE: {
     id: "usr-emp-04",
     name: "Aman Verma",
-    email: "aman@assetflow.enterprise",
+    email: "employee@assetflow.com",
     role: "EMPLOYEE",
     department: "R&D & Engineering",
     status: "ACTIVE",
@@ -47,16 +47,8 @@ const INITIAL_DEMO_USERS = {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem("assetflow_current_user");
-    return saved ? JSON.parse(saved) : INITIAL_DEMO_USERS.ADMIN;
-  });
-
-  const [demoMode, setDemoMode] = useState(() => {
-    const saved = localStorage.getItem("assetflow_demo_mode");
-    return saved !== null ? JSON.parse(saved) : true;
-  });
-
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("assetflow_theme") || "dark";
   });
@@ -71,114 +63,89 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (user) {
-      localStorage.setItem("assetflow_current_user", JSON.stringify(user));
-    }
-  }, [user]);
-
-  useEffect(() => {
-    localStorage.setItem("assetflow_demo_mode", JSON.stringify(demoMode));
-  }, [demoMode]);
+    const initializeAuth = async () => {
+      const savedToken = localStorage.getItem("assetflow_token");
+      if (savedToken) {
+        api.setToken(savedToken);
+        try {
+          const res = await api.getMe();
+          if (res && res.success && res.data) {
+            setUser(res.data.user || res.data);
+          } else {
+            setUser(null);
+            api.setToken(null);
+          }
+        } catch (error) {
+          console.error("Session restore failed:", error);
+          setUser(null);
+          api.setToken(null);
+        }
+      }
+      setLoading(false);
+    };
+    initializeAuth();
+  }, []);
 
   const login = async (email, password) => {
-    if (!demoMode) {
-      try {
-        const res = await api.login({ email, password });
-        if (res && res.user) {
-          setUser(res.user);
-          return { success: true };
-        }
-      } catch (err) {
-        console.warn("Backend API login failed, falling back to Demo Simulation if matching:", err);
+    try {
+      const res = await api.login({ email, password });
+      if (res && res.success && res.data) {
+        const token = res.data.token;
+        const loggedInUser = res.data.user || res.data;
+        api.setToken(token);
+        setUser(loggedInUser);
+        return { success: true };
       }
+      return { success: false, message: res.message || "Login failed" };
+    } catch (err) {
+      console.error("Login API call failed:", err);
+      return { success: false, message: err.message || "Network error" };
     }
-
-    // Demo / Simulation Login Check
-    const foundRole = Object.keys(INITIAL_DEMO_USERS).find(
-      (role) => INITIAL_DEMO_USERS[role].email.toLowerCase() === email.toLowerCase()
-    );
-    if (foundRole) {
-      setUser(INITIAL_DEMO_USERS[foundRole]);
-      return { success: true };
-    }
-
-    // Default to Employee or Admin
-    if (email.includes("admin")) {
-      setUser(INITIAL_DEMO_USERS.ADMIN);
-    } else if (email.includes("manager")) {
-      setUser(INITIAL_DEMO_USERS.ASSET_MANAGER);
-    } else if (email.includes("head")) {
-      setUser(INITIAL_DEMO_USERS.DEPARTMENT_HEAD);
-    } else {
-      setUser({
-        id: "usr-" + Date.now(),
-        name: email.split("@")[0] || "Employee User",
-        email: email,
-        role: "EMPLOYEE",
-        department: "General Operations",
-        status: "ACTIVE",
-        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
-        permissions: ["VIEW_SELF", "REQUEST_ALLOCATIONS", "BOOK_RESOURCES", "RAISE_MAINTENANCE"],
-      });
-    }
-    return { success: true };
   };
 
   const signup = async (name, email, password) => {
-    if (!demoMode) {
-      try {
-        const res = await api.signup({ name, email, password });
-        if (res && res.user) {
-          setUser(res.user);
-          return { success: true };
-        }
-      } catch (err) {
-        console.warn("Backend API signup failed, using simulation:", err);
+    try {
+      const employeeCode = "EMP" + Math.floor(1000 + Math.random() * 9000);
+      const res = await api.signup({ name, email, password, employeeCode });
+      if (res && res.success && res.data) {
+        const token = res.data.token;
+        const loggedInUser = res.data.user || res.data;
+        api.setToken(token);
+        setUser(loggedInUser);
+        return { success: true };
       }
+      return { success: false, message: res.message || "Signup failed" };
+    } catch (err) {
+      console.error("Signup API call failed:", err);
+      return { success: false, message: err.message || "Network error" };
     }
-
-    // Always create EMPLOYEE role as per specifications: "Signup always creates: EMPLOYEE. Only Admin promotes users."
-    const newEmp = {
-      id: "usr-" + Math.floor(1000 + Math.random() * 9000),
-      name,
-      email,
-      role: "EMPLOYEE",
-      department: "General Operations",
-      status: "ACTIVE",
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
-      permissions: ["VIEW_SELF", "REQUEST_ALLOCATIONS", "BOOK_RESOURCES", "RAISE_MAINTENANCE"],
-    };
-    setUser(newEmp);
-    return { success: true };
   };
 
   const logout = async () => {
-    if (!demoMode) {
-      try {
-        await api.logout();
-      } catch (e) {
-        /* ignore */
-      }
+    try {
+      await api.logout();
+    } catch (e) {
+      // Ignore
     }
     setUser(null);
+    api.setToken(null);
   };
 
-  const switchRole = (roleKey) => {
-    if (INITIAL_DEMO_USERS[roleKey]) {
-      setUser(INITIAL_DEMO_USERS[roleKey]);
-    } else {
-      setUser((prev) => ({ ...prev, role: roleKey }));
+  const switchRole = async (roleKey) => {
+    const emails = {
+      ADMIN: "admin@assetflow.com",
+      ASSET_MANAGER: "manager@assetflow.com",
+      DEPARTMENT_HEAD: "head@assetflow.com",
+      EMPLOYEE: "employee@assetflow.com",
+    };
+    const email = emails[roleKey];
+    if (email) {
+      return await login(email, "password123");
     }
   };
 
-  const continueAsGuest = () => {
-    const guestUser = {
-      ...INITIAL_DEMO_USERS.ADMIN,
-      name: "Guest Admin (Demo)",
-      email: "guest@assetflow.enterprise",
-    };
-    setUser(guestUser);
-    return { success: true };
+  const continueAsGuest = async () => {
+    return await login("admin@assetflow.com", "password123");
   };
 
   return (
@@ -186,13 +153,13 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         setUser,
+        loading,
         login,
         signup,
         logout,
         switchRole,
         continueAsGuest,
-        demoMode,
-        setDemoMode,
+        demoMode: false,
         theme,
         toggleTheme,
         demoUsersList: INITIAL_DEMO_USERS,

@@ -1,7 +1,39 @@
+const prisma = require("../config/db");
 const departmentService = require("../services/department.service");
 const { createDepartmentSchema, updateDepartmentSchema } = require("../validators/department.validator");
 const { sendSuccess } = require("../utils/response");
 const asyncHandler = require("../utils/asyncHandler");
+
+const isUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
+const resolveDeptAndHead = async (body) => {
+  const resolved = { ...body };
+  if (resolved.parentDepartmentId && !isUUID(resolved.parentDepartmentId)) {
+    const parent = await prisma.department.findFirst({
+      where: { name: resolved.parentDepartmentId }
+    });
+    resolved.parentDepartmentId = parent ? parent.id : null;
+  }
+  if (resolved.parentDepartment && !isUUID(resolved.parentDepartment)) {
+    const parent = await prisma.department.findFirst({
+      where: { name: resolved.parentDepartment }
+    });
+    resolved.parentDepartmentId = parent ? parent.id : null;
+  }
+  if (resolved.headId && !isUUID(resolved.headId)) {
+    const head = await prisma.user.findFirst({
+      where: { name: resolved.headId }
+    });
+    resolved.headId = head ? head.id : null;
+  }
+  if (resolved.head && !isUUID(resolved.head)) {
+    const head = await prisma.user.findFirst({
+      where: { name: resolved.head }
+    });
+    resolved.headId = head ? head.id : null;
+  }
+  return resolved;
+};
 
 const getDepartments = asyncHandler(async (req, res) => {
   const { search, status, page, limit } = req.query;
@@ -33,7 +65,8 @@ const getDepartmentById = asyncHandler(async (req, res) => {
 });
 
 const createDepartment = asyncHandler(async (req, res) => {
-  const parsedData = createDepartmentSchema.parse(req.body);
+  const resolvedBody = await resolveDeptAndHead(req.body);
+  const parsedData = createDepartmentSchema.parse(resolvedBody);
 
   const department = await departmentService.createDepartment(parsedData, req.user.id);
 
@@ -47,7 +80,8 @@ const createDepartment = asyncHandler(async (req, res) => {
 
 const updateDepartment = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const parsedData = updateDepartmentSchema.parse(req.body);
+  const resolvedBody = await resolveDeptAndHead(req.body);
+  const parsedData = updateDepartmentSchema.parse(resolvedBody);
 
   const department = await departmentService.updateDepartment(id, parsedData, req.user.id);
 

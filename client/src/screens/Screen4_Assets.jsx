@@ -25,7 +25,24 @@ import {
 
 export const Screen4_Assets = () => {
   const { user } = useAuth();
-  const { assets, setAssets, categories, departments, createAsset, generateNextTag, createActivityLog } = useERP();
+  const {
+    assets,
+    categories,
+    departments,
+    fetchAssets,
+    fetchCategories,
+    fetchDepartments,
+    createAsset,
+    deleteAsset,
+    generateNextTag,
+  } = useERP();
+
+  // Fetch lists on screen mount
+  React.useEffect(() => {
+    fetchAssets();
+    fetchCategories();
+    fetchDepartments();
+  }, []);
 
   // Filter & Search State
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,52 +55,110 @@ export const Screen4_Assets = () => {
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [activeDrawerTab, setActiveDrawerTab] = useState("details"); // "details" | "allocations" | "maintenance"
 
+  // Dynamic history states
+  const [allocationHistory, setAllocationHistory] = useState([]);
+  const [maintenanceHistory, setMaintenanceHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+
+  React.useEffect(() => {
+    if (!selectedAsset) return;
+    const fetchHistory = async () => {
+      setLoadingHistory(true);
+      try {
+        if (activeDrawerTab === "allocations") {
+          const res = await api.request(`/allocation/history/${selectedAsset.id}`);
+          if (res && res.success) {
+            setAllocationHistory(res.data || []);
+          }
+        } else if (activeDrawerTab === "maintenance") {
+          const res = await api.request(`/maintenance?assetId=${selectedAsset.id}`);
+          if (res && res.success) {
+            setMaintenanceHistory(res.data.maintenances || res.data || []);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching asset history:", err);
+      } finally {
+        setLoadingHistory(false);
+      }
+    };
+    fetchHistory();
+  }, [selectedAsset, activeDrawerTab]);
+
   // Create Asset Modal State
   const [showAddModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    category: "Electronics",
+    category: "",
     serialNumber: "",
     purchaseCost: "",
     purchaseDate: new Date().toISOString().split("T")[0],
     location: "HQ - Floor 4 (Eng Wing)",
-    department: "R&D & Engineering",
+    department: "",
     condition: "New",
     shared: false,
     photo: "",
     customMetadata: { Warranty: "3 Years Standard", Voltage: "220V", Brand: "" },
   });
 
+  React.useEffect(() => {
+    if (showAddModal) {
+      setFormData((prev) => ({
+        ...prev,
+        category: categories[0]?.name || "Electronics",
+        department: departments[0]?.name || "R&D & Engineering"
+      }));
+    }
+  }, [showAddModal, categories, departments]);
+
+
   const nextTagPreview = generateNextTag();
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name) return;
-    await createAsset(formData);
-    setShowAddModal(false);
-    setFormData({
-      name: "",
-      category: "Electronics",
-      serialNumber: "",
-      purchaseCost: "",
-      purchaseDate: new Date().toISOString().split("T")[0],
-      location: "HQ - Floor 4 (Eng Wing)",
-      department: "R&D & Engineering",
-      condition: "New",
-      shared: false,
-      photo: "",
-      customMetadata: { Warranty: "3 Years Standard", Voltage: "220V", Brand: "" },
-    });
+    try {
+      const res = await createAsset(formData);
+      if (res && res.success) {
+        setShowAddModal(false);
+        setFormData({
+          name: "",
+          category: "Electronics",
+          serialNumber: "",
+          purchaseCost: "",
+          purchaseDate: new Date().toISOString().split("T")[0],
+          location: "HQ - Floor 4 (Eng Wing)",
+          department: "R&D & Engineering",
+          condition: "New",
+          shared: false,
+          photo: "",
+          customMetadata: { Warranty: "3 Years Standard", Voltage: "220V", Brand: "" },
+        });
+      } else {
+        alert(res?.message || "Failed to create asset");
+      }
+    } catch (err) {
+      alert(err.message || "An error occurred");
+    }
   };
 
-  const handleDeleteAsset = (id, tag, name) => {
+  const handleDeleteAsset = async (id, tag, name) => {
     if (user?.role !== "ADMIN" && user?.role !== "ASSET_MANAGER") {
       alert("Permission denied: Only Admin or Asset Manager can delete assets (`CRUD` route permission).");
       return;
     }
-    setAssets((prev) => prev.filter((a) => a.id !== id));
-    createActivityLog({ action: "Deleted Asset", entity: `${tag} - ${name}`, metadata: "DELETE /assets/:id" });
-    if (selectedAsset?.id === id) setSelectedAsset(null);
+    if (window.confirm(`Are you sure you want to delete asset ${tag} - ${name}?`)) {
+      try {
+        const res = await deleteAsset(id);
+        if (res && res.success) {
+          if (selectedAsset?.id === id) setSelectedAsset(null);
+        } else {
+          alert(res?.message || "Failed to delete asset");
+        }
+      } catch (err) {
+        alert(err.message || "An error occurred");
+      }
+    }
   };
 
   // Filter logic
@@ -128,7 +203,7 @@ export const Screen4_Assets = () => {
       <div className="page-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Screen 4: Asset Module</span>
+            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Asset Directory</span>
             <span className="badge badge-info" style={{ fontSize: "0.75rem" }}>Tag format: AF-0001 (Auto-generated)</span>
           </div>
           <h1 className="page-title" style={{ marginTop: "8px" }}>Asset Inventory & Lifecycle Tracker</h1>
@@ -408,22 +483,26 @@ export const Screen4_Assets = () => {
                 <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "14px" }}>
                   Complete historical audit of users and departments holding <strong>{selectedAsset.tag}</strong>.
                 </div>
-                {selectedAsset.allocationHistory?.length === 0 ? (
+                {loadingHistory ? (
+                  <div style={{ padding: "20px", textAlign: "center", color: "var(--text-muted)" }}>
+                    Loading allocation history...
+                  </div>
+                ) : allocationHistory.length === 0 ? (
                   <div style={{ padding: "20px", textAlign: "center", color: "var(--text-muted)", background: "var(--bg-app)", borderRadius: "var(--radius-md)" }}>
                     No previous allocation history. Currently unassigned.
                   </div>
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                    {selectedAsset.allocationHistory?.map((h) => (
+                    {allocationHistory.map((h) => (
                       <div key={h.id} style={{ padding: "14px", borderRadius: "var(--radius-md)", background: "var(--bg-app)", borderLeft: "4px solid var(--primary)" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                          <span style={{ fontWeight: 600, fontSize: "0.95rem" }}>{h.allocatedTo}</span>
-                          <span className="badge badge-info" style={{ fontSize: "0.7rem" }}>{h.department}</span>
+                          <span style={{ fontWeight: 600, fontSize: "0.95rem" }}>{h.employee?.name || "Unknown"}</span>
+                          <span className="badge badge-info" style={{ fontSize: "0.7rem" }}>{h.employee?.department?.name || "Shared"}</span>
                         </div>
                         <div style={{ fontSize: "0.78rem", color: "var(--text-secondary)" }}>
-                          Allocated: {h.allocatedAt} {h.returnedAt ? `→ Returned: ${h.returnedAt}` : "(Current Holder)"}
+                          Allocated: {h.allocatedDate ? new Date(h.allocatedDate).toLocaleDateString() : ""} {h.returnedDate ? `→ Returned: ${new Date(h.returnedDate).toLocaleDateString()}` : "(Current Holder)"}
                         </div>
-                        {h.notes && <div style={{ fontSize: "0.8rem", color: "var(--text-main)", marginTop: "6px", fontStyle: "italic" }}>"{h.notes}"</div>}
+                        {h.remarks && <div style={{ fontSize: "0.8rem", color: "var(--text-main)", marginTop: "6px", fontStyle: "italic" }}>"{h.remarks}"</div>}
                       </div>
                     ))}
                   </div>
@@ -437,20 +516,24 @@ export const Screen4_Assets = () => {
                 <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "14px" }}>
                   Recorded maintenance repairs, firmware upgrades, and servicing costs.
                 </div>
-                {selectedAsset.maintenanceHistory?.length === 0 ? (
+                {loadingHistory ? (
+                  <div style={{ padding: "20px", textAlign: "center", color: "var(--text-muted)" }}>
+                    Loading maintenance history...
+                  </div>
+                ) : maintenanceHistory.length === 0 ? (
                   <div style={{ padding: "20px", textAlign: "center", color: "var(--text-muted)", background: "var(--bg-app)", borderRadius: "var(--radius-md)" }}>
                     No maintenance records for this asset. Operating smoothly!
                   </div>
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                    {selectedAsset.maintenanceHistory?.map((m) => (
+                    {maintenanceHistory.map((m) => (
                       <div key={m.id} style={{ padding: "14px", borderRadius: "var(--radius-md)", background: "var(--bg-app)", borderLeft: "4px solid var(--warning)" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                          <span style={{ fontWeight: 600 }}>{m.technician}</span>
-                          <span className="badge badge-warning">${m.cost}</span>
+                          <span style={{ fontWeight: 600 }}>{m.technician || "Internal Support"}</span>
+                          <span className="badge badge-warning">${m.costEstimate || 0}</span>
                         </div>
-                        <div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>Date: {m.date}</div>
-                        <div style={{ fontSize: "0.85rem", color: "var(--text-main)", marginTop: "6px" }}>{m.description}</div>
+                        <div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>Date: {m.createdAt ? new Date(m.createdAt).toLocaleDateString() : ""}</div>
+                        <div style={{ fontSize: "0.85rem", color: "var(--text-main)", marginTop: "6px" }}>{m.issue || m.description}</div>
                       </div>
                     ))}
                   </div>

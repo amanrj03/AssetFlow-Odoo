@@ -17,9 +17,19 @@ import {
 
 export const Screen8_Audit = () => {
   const { user } = useAuth();
-  const { auditCycles, setAuditCycles, assets, setAssets, createActivityLog } = useERP();
+  const {
+    auditCycles,
+    fetchAuditCycles,
+    fetchAssets,
+    assets
+  } = useERP();
 
-  const [selectedCycleId, setSelectedCycleId] = useState(auditCycles[0]?.id || "");
+  React.useEffect(() => {
+    fetchAuditCycles();
+    fetchAssets();
+  }, []);
+
+  const [selectedCycleId, setSelectedCycleId] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [title, setTitle] = useState("Q4 2026 Comprehensive Asset Inventory Audit");
   const [auditor, setAuditor] = useState(user?.name || "Priya Sharma");
@@ -27,96 +37,78 @@ export const Screen8_Audit = () => {
 
   const currentCycle = auditCycles.find((c) => c.id === selectedCycleId) || auditCycles[0];
 
-  const handleVerifyItem = (assetId, verificationStatus) => {
-    if (!currentCycle || currentCycle.status === "Closed") return;
+  React.useEffect(() => {
+    if (auditCycles.length > 0 && !selectedCycleId) {
+      setSelectedCycleId(auditCycles[0].id);
+    }
+  }, [auditCycles, selectedCycleId]);
 
-    setAuditCycles((prev) =>
-      prev.map((cycle) => {
-        if (cycle.id === currentCycle.id) {
-          const updatedItems = cycle.items.map((it) => (it.assetId === assetId ? { ...it, verification: verificationStatus } : it));
-          return { ...cycle, items: updatedItems };
+  const handleVerifyItem = async (assetId, verificationStatus) => {
+    if (!currentCycle || currentCycle.status === "CLOSED" || currentCycle.status === "Closed") return;
+    try {
+      const res = await api.request(`/audits/${currentCycle.id}/verify`, {
+        method: "POST",
+        body: JSON.stringify({
+          assetId,
+          verification: verificationStatus,
+          notes: `Verified during audit cycle: ${currentCycle.title}`
+        })
+      });
+      if (res && res.success) {
+        await fetchAuditCycles();
+      } else {
+        alert(res?.message || "Failed to record asset verification");
+      }
+    } catch (err) {
+      alert(err.message || "An error occurred");
+    }
+  };
+
+  const handleCloseAudit = async () => {
+    if (!currentCycle || currentCycle.status === "CLOSED" || currentCycle.status === "Closed") return;
+    if (window.confirm("Are you sure you want to close this audit cycle and update missing assets status to LOST?")) {
+      try {
+        const res = await api.request(`/audits/${currentCycle.id}/close`, {
+          method: "PATCH"
+        });
+        if (res && res.success) {
+          await fetchAuditCycles();
+          await fetchAssets();
+        } else {
+          alert(res?.message || "Failed to close audit cycle");
         }
-        return cycle;
-      })
-    );
+      } catch (err) {
+        alert(err.message || "An error occurred");
+      }
+    }
   };
 
-  const handleCloseAudit = () => {
-    if (!currentCycle || currentCycle.status === "Closed") return;
-
-    // "Closing audit (Backend): Generate discrepancy report -> Update Lost assets -> Save history. Exactly as mockup."
-    const missingItems = currentCycle.items.filter((it) => it.verification === "Missing");
-    const damagedItems = currentCycle.items.filter((it) => it.verification === "Damaged");
-    const verifiedItems = currentCycle.items.filter((it) => it.verification === "Verified");
-
-    const discrepancyReport = {
-      closedAt: new Date().toISOString().replace("T", " ").substring(0, 19),
-      verifiedCount: verifiedItems.length,
-      missingCount: missingItems.length,
-      damagedCount: damagedItems.length,
-      missingTags: missingItems.map((i) => i.assetTag),
-      damagedTags: damagedItems.map((i) => i.assetTag),
-    };
-
-    // Update Lost assets status in main inventory
-    if (missingItems.length > 0) {
-      setAssets((prev) =>
-        prev.map((a) => {
-          if (missingItems.some((m) => m.assetId === a.id || m.assetTag === a.tag)) {
-            return { ...a, status: "Lost" };
-          }
-          return a;
-        })
-      );
-    }
-
-    if (damagedItems.length > 0) {
-      setAssets((prev) =>
-        prev.map((a) => {
-          if (damagedItems.some((d) => d.assetId === a.id || d.assetTag === a.tag)) {
-            return { ...a, condition: "Needs Repair", status: "Under Maintenance" };
-          }
-          return a;
-        })
-      );
-    }
-
-    setAuditCycles((prev) =>
-      prev.map((cycle) => (cycle.id === currentCycle.id ? { ...cycle, status: "Closed", discrepancyReport } : cycle))
-    );
-
-    createActivityLog({
-      action: "Closed Audit Cycle",
-      entity: currentCycle.title,
-      metadata: `Missing: ${missingItems.length} | Damaged: ${damagedItems.length}`,
-    });
-  };
-
-  const handleCreateCycle = (e) => {
+  const handleCreateCycle = async (e) => {
     e.preventDefault();
     if (!title) return;
 
-    const newCycle = {
-      id: "aud-" + Date.now(),
-      title,
-      assignedAuditor: auditor,
-      scope,
-      status: "In Progress",
-      startDate: new Date().toISOString().split("T")[0],
-      items: assets.slice(0, 6).map((a) => ({
-        assetId: a.id,
-        assetTag: a.tag,
-        assetName: a.name,
-        verification: "Pending",
-        notes: `Initial check for ${scope}`,
-      })),
-      discrepancyReport: null,
-    };
-
-    setAuditCycles((prev) => [newCycle, ...prev]);
-    setSelectedCycleId(newCycle.id);
-    setShowAddModal(false);
-    createActivityLog({ action: "Created Audit Cycle", entity: title, metadata: `Auditor: ${auditor}` });
+    try {
+      const res = await api.request("/audits", {
+        method: "POST",
+        body: JSON.stringify({
+          title,
+          scope,
+          startDate: new Date().toISOString(),
+          endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        })
+      });
+      if (res && res.success) {
+        await fetchAuditCycles();
+        setShowAddModal(false);
+        if (res.data?.cycle?.id) {
+          setSelectedCycleId(res.data.cycle.id);
+        }
+      } else {
+        alert(res?.message || "Failed to create audit cycle");
+      }
+    } catch (err) {
+      alert(err.message || "An error occurred");
+    }
   };
 
   const getVerificationBadge = (v) => {
@@ -134,7 +126,7 @@ export const Screen8_Audit = () => {
       <div className="page-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Screen 8: Audit Module</span>
+            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Asset Audits</span>
             <span className="badge badge-info" style={{ fontSize: "0.75rem" }}>POST/GET /audit-cycle</span>
           </div>
           <h1 className="page-title" style={{ marginTop: "8px" }}>Physical Audit Verification & Discrepancy Engine</h1>

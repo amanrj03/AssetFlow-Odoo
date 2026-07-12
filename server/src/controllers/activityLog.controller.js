@@ -3,10 +3,18 @@ const { sendSuccess } = require("../utils/response");
 const asyncHandler = require("../utils/asyncHandler");
 
 const getActivityLogs = asyncHandler(async (req, res) => {
-  const { userId, action, entity, page, limit } = req.query;
+  let { userId, action, entity, page, limit } = req.query;
+
+  let departmentId = undefined;
+  if (req.user.role === "DEPARTMENT_HEAD") {
+    departmentId = req.user.departmentId;
+  } else if (req.user.role === "EMPLOYEE") {
+    userId = req.user.id;
+  }
 
   const result = await activityLogService.getActivityLogs({
     userId,
+    departmentId,
     action,
     entity,
     page: page ? parseInt(page) : 1,

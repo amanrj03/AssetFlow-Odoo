@@ -54,11 +54,18 @@ const updateEmployee = asyncHandler(async (req, res) => {
 });
 
 const promoteEmployee = asyncHandler(async (req, res) => {
-  const parsedData = promoteEmployeeSchema.parse(req.body);
+  const employeeId = req.params.id || req.body.userId || req.body.employeeId;
+  const role = req.body.role;
+
+  if (!employeeId || !role) {
+    const error = new Error("Employee ID and role are required.");
+    error.statusCode = 400;
+    throw error;
+  }
 
   const employee = await employeeService.promoteEmployee(
-    parsedData.employeeId,
-    parsedData.role,
+    employeeId,
+    role,
     req.user.id
   );
 
@@ -70,11 +77,18 @@ const promoteEmployee = asyncHandler(async (req, res) => {
 });
 
 const changeStatus = asyncHandler(async (req, res) => {
-  const parsedData = changeStatusSchema.parse(req.body);
+  const employeeId = req.params.id || req.body.userId || req.body.employeeId;
+  const status = req.body.status;
+
+  if (!employeeId || !status) {
+    const error = new Error("Employee ID and status are required.");
+    error.statusCode = 400;
+    throw error;
+  }
 
   const employee = await employeeService.changeStatus(
-    parsedData.employeeId,
-    parsedData.status,
+    employeeId,
+    status,
     req.user.id
   );
 

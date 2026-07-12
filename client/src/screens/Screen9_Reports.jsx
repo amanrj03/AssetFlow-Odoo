@@ -18,7 +18,24 @@ import {
 
 export const Screen9_Reports = () => {
   const { user } = useAuth();
-  const { assets, bookings, maintenances, departments } = useERP();
+  const {
+    assets,
+    bookings,
+    maintenances,
+    departments,
+    fetchAssets,
+    fetchBookings,
+    fetchMaintenances,
+    fetchDepartments,
+  } = useERP();
+
+  React.useEffect(() => {
+    fetchAssets();
+    fetchBookings();
+    fetchMaintenances();
+    fetchDepartments();
+  }, []);
+
   const [activeTab, setActiveTab] = useState("utilization"); // "utilization" | "assets" | "maintenance" | "heatmap"
 
   // 1. Department Utilization calculation (`GET /reports/utilization`)
@@ -86,7 +103,7 @@ export const Screen9_Reports = () => {
       <div className="page-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
-            <span className="badge badge-coral">MODULE 8 • ANALYTICS</span>
+            <span className="badge badge-coral">BI & ANALYTICS</span>
             <span className="badge badge-neutral">BI & Reporting</span>
           </div>
           <h1 className="page-title">Enterprise Intelligence & Analytics Reports</h1>

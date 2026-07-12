@@ -21,7 +21,19 @@ import {
 
 export const Screen10_Notifications = () => {
   const { user } = useAuth();
-  const { notifications, markNotificationRead, markAllNotificationsRead, activityLogs } = useERP();
+  const {
+    notifications,
+    markNotificationRead,
+    markAllNotificationsRead,
+    activityLogs,
+    fetchNotifications,
+    fetchActivityLogs,
+  } = useERP();
+
+  React.useEffect(() => {
+    fetchNotifications();
+    fetchActivityLogs();
+  }, []);
 
   const [activeTab, setActiveTab] = useState("notifications"); // "notifications" | "logs"
   const [filterType, setFilterType] = useState("ALL");
@@ -34,11 +46,15 @@ export const Screen10_Notifications = () => {
   const filteredLogs = activityLogs.filter((log) => {
     if (!searchLog) return true;
     const term = searchLog.toLowerCase();
+    const who = (log.user?.name || log.who || "").toLowerCase();
+    const action = (log.action || "").toLowerCase();
+    const entity = (log.entity || "").toLowerCase();
+    const metaString = typeof log.metadata === "object" ? JSON.stringify(log.metadata) : (log.metadata || "");
     return (
-      log.who.toLowerCase().includes(term) ||
-      log.action.toLowerCase().includes(term) ||
-      log.entity.toLowerCase().includes(term) ||
-      (log.metadata && log.metadata.toLowerCase().includes(term))
+      who.includes(term) ||
+      action.includes(term) ||
+      entity.includes(term) ||
+      metaString.toLowerCase().includes(term)
     );
   });
 
@@ -74,7 +90,7 @@ export const Screen10_Notifications = () => {
       <div className="page-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Screen 10: Notifications Module</span>
+            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>System Alerts</span>
             <span className="badge badge-success" style={{ fontSize: "0.75rem" }}>createActivityLog() Audit Trail</span>
           </div>
           <h1 className="page-title" style={{ marginTop: "8px" }}>Notification Center & System Activity Audit Logs</h1>
@@ -219,19 +235,23 @@ export const Screen10_Notifications = () => {
                 {filteredLogs.map((log) => (
                   <tr key={log.id}>
                     <td>
-                      <div style={{ fontWeight: 700, color: "var(--text-main)" }}>{log.who}</div>
-                      <div style={{ fontFamily: "Fira Code", fontSize: "0.72rem", color: "var(--text-muted)", marginTop: "2px" }}>{log.id}</div>
+                      <div style={{ fontWeight: 700, color: "var(--text-main)" }}>{log.user?.name || log.who || "System"}</div>
+                      <div style={{ fontFamily: "Fira Code", fontSize: "0.72rem", color: "var(--text-muted)", marginTop: "2px" }}>ID: {log.id}</div>
                     </td>
                     <td>
                       <span className="badge badge-purple" style={{ fontSize: "0.78rem" }}>{log.action}</span>
                     </td>
                     <td style={{ fontWeight: 600, color: "var(--primary)" }}>{log.entity}</td>
                     <td style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontStyle: "italic" }}>
-                      {log.metadata || "(No extra metadata)"}
+                      {typeof log.metadata === "object" ? JSON.stringify(log.metadata) : (log.metadata || "(No extra metadata)")}
                     </td>
                     <td>
-                      <div style={{ fontFamily: "Fira Code", fontSize: "0.82rem", color: "var(--text-main)" }}>{log.timestamp}</div>
-                      <div style={{ fontFamily: "Fira Code", fontSize: "0.72rem", color: "var(--text-muted)", marginTop: "2px" }}>IP: {log.ip}</div>
+                      <div style={{ fontFamily: "Fira Code", fontSize: "0.82rem", color: "var(--text-main)" }}>
+                        {log.createdAt ? new Date(log.createdAt).toLocaleString() : log.timestamp}
+                      </div>
+                      <div style={{ fontFamily: "Fira Code", fontSize: "0.72rem", color: "var(--text-muted)", marginTop: "2px" }}>
+                        IP: {log.ipAddress || log.ip || "127.0.0.1"}
+                      </div>
                     </td>
                   </tr>
                 ))}

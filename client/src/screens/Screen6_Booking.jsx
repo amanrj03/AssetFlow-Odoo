@@ -19,7 +19,11 @@ import {
 
 export const Screen6_Booking = () => {
   const { user } = useAuth();
-  const { bookings, setBookings, createBooking } = useERP();
+  const { bookings, fetchBookings, createBooking, deleteBooking } = useERP();
+
+  React.useEffect(() => {
+    fetchBookings();
+  }, []);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [resource, setResource] = useState("Conference Room A (Executive Suite)");
@@ -32,29 +36,61 @@ export const Screen6_Booking = () => {
   const [conflictMsg, setConflictMsg] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setConflictMsg(null);
     setSuccessMsg(null);
 
-    const result = createBooking({ resource, employee, start, end, notes });
-    if (!result.success) {
+    try {
+      const result = await createBooking({ resource, employee, start, end, notes });
+      if (result && !result.success) {
+        setConflictMsg({
+          message: result.message || "Overlap conflict detected.",
+          sqlQuery: "existing.start < new.end AND existing.end > new.start",
+        });
+      } else if (result) {
+        setSuccessMsg(result.message || "Reservation confirmed successfully.");
+        setShowAddModal(false);
+      }
+    } catch (err) {
       setConflictMsg({
-        message: result.message,
+        message: err.message || "An error occurred during booking.",
         sqlQuery: "existing.start < new.end AND existing.end > new.start",
       });
-    } else {
-      setSuccessMsg(result.message);
-      setShowAddModal(false);
     }
   };
 
-  const handleUpdateStatus = (id, newStatus) => {
-    setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status: newStatus } : b)));
+  const handleUpdateStatus = async (id, newStatus) => {
+    if (newStatus === "Cancelled") {
+      if (window.confirm("Are you sure you want to cancel this reservation?")) {
+        try {
+          const res = await api.request(`/bookings/${id}/cancel`, {
+            method: "PATCH",
+            body: JSON.stringify({ reason: "Cancelled by employee from dashboard" })
+          });
+          if (res && res.success) {
+            await fetchBookings();
+          } else {
+            alert(res?.message || "Failed to cancel booking");
+          }
+        } catch (err) {
+          alert(err.message || "An error occurred");
+        }
+      }
+    }
   };
 
-  const handleDelete = (id) => {
-    setBookings((prev) => prev.filter((b) => b.id !== id));
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this reservation record?")) {
+      try {
+        const res = await deleteBooking(id);
+        if (res && !res.success) {
+          alert(res.message || "Failed to delete booking");
+        }
+      } catch (err) {
+        alert(err.message || "An error occurred");
+      }
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -79,7 +115,7 @@ export const Screen6_Booking = () => {
       <div className="page-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Screen 6: Resource Booking</span>
+            <span className="badge badge-purple" style={{ fontSize: "0.75rem" }}>Resource Bookings</span>
             <span className="badge badge-info" style={{ fontSize: "0.75rem" }}>SQL Check: existing.start &lt; new.end AND existing.end &gt; new.start</span>
           </div>
           <h1 className="page-title" style={{ marginTop: "8px" }}>Resource & Conference Room Reservations</h1>
@@ -140,26 +176,26 @@ export const Screen6_Booking = () => {
               <tr key={bk.id}>
                 <td>
                   <div style={{ display: "flex", alignItems: "center", gap: "10px", fontWeight: 600, color: "var(--text-main)" }}>
-                    {getResourceIcon(bk.resource)}
-                    <span>{bk.resource}</span>
+                    {getResourceIcon(bk.asset?.name || bk.resource || "")}
+                    <span>{bk.asset?.name || bk.resource}</span>
                   </div>
                 </td>
-                <td style={{ fontWeight: 500 }}>{bk.employee}</td>
+                <td style={{ fontWeight: 500 }}>{bk.employee?.name || bk.employee}</td>
                 <td>
                   <div style={{ fontFamily: "Fira Code", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                    {bk.start.replace("T", " ")}
+                    {bk.startTime ? bk.startTime.replace("T", " ").substring(0, 16) : bk.start?.replace("T", " ")}
                   </div>
                 </td>
                 <td>
                   <div style={{ fontFamily: "Fira Code", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                    {bk.end.replace("T", " ")}
+                    {bk.endTime ? bk.endTime.replace("T", " ").substring(0, 16) : bk.end?.replace("T", " ")}
                   </div>
                 </td>
                 <td>
                   <span className={`badge ${getStatusBadge(bk.status)}`}>{bk.status}</span>
                 </td>
                 <td>
-                  <div style={{ fontSize: "0.85rem", color: "var(--text-main)" }}>{bk.notes}</div>
+                  <div style={{ fontSize: "0.85rem", color: "var(--text-main)" }}>{bk.purpose || bk.notes}</div>
                   <div style={{ fontSize: "0.72rem", color: "var(--warning)", marginTop: "3px", display: "flex", alignItems: "center", gap: "4px" }}>
                     <BellRing size={12} /> Cron: 30 min prior reminder active
                   </div>

@@ -1,3 +1,4 @@
+const prisma = require("../config/db");
 const bookingService = require("../services/booking.service");
 const {
   createBookingSchema,
@@ -7,12 +8,54 @@ const {
 const { sendSuccess } = require("../utils/response");
 const asyncHandler = require("../utils/asyncHandler");
 
+const isUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
+const resolveBookingRefs = async (body) => {
+  const resolved = { ...body };
+  
+  let assetId = resolved.assetId || resolved.resource;
+  if (assetId && !isUUID(assetId)) {
+    const cleanName = assetId.split("(")[0].trim();
+    let asset = await prisma.asset.findFirst({
+      where: { name: { contains: cleanName, mode: "insensitive" } }
+    });
+    if (!asset) {
+      asset = await prisma.asset.findFirst({
+        where: { isBookable: true }
+      });
+    }
+    resolved.assetId = asset ? asset.id : null;
+  }
+
+  let employeeId = resolved.employeeId || resolved.employee;
+  if (employeeId && !isUUID(employeeId)) {
+    const user = await prisma.user.findFirst({
+      where: { name: { equals: employeeId, mode: "insensitive" } }
+    });
+    resolved.employeeId = user ? user.id : null;
+  }
+
+  if (resolved.start) resolved.startTime = new Date(resolved.start).toISOString();
+  if (resolved.end) resolved.endTime = new Date(resolved.end).toISOString();
+  if (resolved.notes) resolved.purpose = resolved.notes;
+
+  return resolved;
+};
+
 const getBookings = asyncHandler(async (req, res) => {
-  const { assetId, employeeId, status, page, limit } = req.query;
+  let { assetId, employeeId, status, page, limit } = req.query;
+
+  let departmentId = undefined;
+  if (req.user.role === "DEPARTMENT_HEAD") {
+    departmentId = req.user.departmentId;
+  } else if (req.user.role === "EMPLOYEE") {
+    employeeId = req.user.id;
+  }
 
   const result = await bookingService.getBookings({
     assetId,
     employeeId,
+    departmentId,
     status,
     page: page ? parseInt(page) : 1,
     limit: limit ? parseInt(limit) : 10,
@@ -34,7 +77,8 @@ const getCalendarBookings = asyncHandler(async (req, res) => {
 });
 
 const createBooking = asyncHandler(async (req, res) => {
-  const parsedData = createBookingSchema.parse(req.body);
+  const resolvedBody = await resolveBookingRefs(req.body);
+  const parsedData = createBookingSchema.parse(resolvedBody);
   const booking = await bookingService.createBooking(parsedData, req.user.id);
   return sendSuccess(res, "Booking created successfully", { booking }, 201);
 });

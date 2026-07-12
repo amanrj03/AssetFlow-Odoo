@@ -21,7 +21,7 @@ const syncBookingStatuses = async () => {
   });
 };
 
-const getBookings = async ({ assetId, employeeId, status, page = 1, limit = 10 }) => {
+const getBookings = async ({ assetId, employeeId, departmentId, status, page = 1, limit = 10 }) => {
   await syncBookingStatuses();
 
   const skip = (page - 1) * limit;
@@ -32,6 +32,11 @@ const getBookings = async ({ assetId, employeeId, status, page = 1, limit = 10 }
   if (assetId) where.assetId = assetId;
   if (employeeId) where.bookedById = employeeId;
   if (status) where.status = status;
+  if (departmentId) {
+    where.asset = {
+      departmentId: departmentId
+    };
+  }
 
   const [total, bookings] = await prisma.$transaction([
     prisma.resourceBooking.count({ where }),

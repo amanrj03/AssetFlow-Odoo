@@ -1,6 +1,6 @@
 const prisma = require("../config/db");
 
-const getMaintenanceRequests = async ({ assetId, status, page = 1, limit = 10 }) => {
+const getMaintenanceRequests = async ({ assetId, status, departmentId, raisedById, page = 1, limit = 10 }) => {
   const skip = (page - 1) * limit;
   const take = parseInt(limit);
 
@@ -8,6 +8,14 @@ const getMaintenanceRequests = async ({ assetId, status, page = 1, limit = 10 })
 
   if (assetId) where.assetId = assetId;
   if (status) where.status = status;
+  if (departmentId) {
+    where.asset = {
+      departmentId: departmentId
+    };
+  }
+  if (raisedById) {
+    where.raisedById = raisedById;
+  }
 
   const [total, requests] = await prisma.$transaction([
     prisma.maintenanceRequest.count({ where }),

@@ -20,13 +20,17 @@ export const Screen3_OrgSetup = () => {
   const { user } = useAuth();
   const {
     departments,
-    setDepartments,
     categories,
-    setCategories,
     employees,
+    fetchDepartments,
+    fetchCategories,
+    fetchEmployees,
+    createDepartment,
+    deleteDepartment,
+    createCategory,
+    deleteCategory,
     promoteEmployee,
     toggleEmployeeStatus,
-    createActivityLog,
   } = useERP();
 
   const [activeSubTab, setActiveSubTab] = useState("departments");
@@ -47,53 +51,83 @@ export const Screen3_OrgSetup = () => {
   const [catMetaKey2, setCatMetaKey2] = useState("Voltage");
   const [catMetaExample2, setCatMetaExample2] = useState("220V AC");
 
-  const handleCreateDepartment = (e) => {
+  // Fetch lists on screen mount
+  React.useEffect(() => {
+    fetchDepartments();
+    fetchCategories();
+    fetchEmployees();
+  }, []);
+
+  const handleCreateDepartment = async (e) => {
     e.preventDefault();
     if (!deptName) return;
-    const newDept = {
-      id: "dept-" + Date.now(),
-      name: deptName,
-      parentDepartment: deptParent,
-      head: deptHead,
-      status: "ACTIVE",
-      assetCount: 0,
-      employeeCount: 1,
-    };
-    setDepartments((prev) => [...prev, newDept]);
-    createActivityLog({ action: "Created Department", entity: deptName, metadata: `Head: ${deptHead} | Parent: ${deptParent}` });
-    setShowDeptModal(false);
-    setDeptName("");
+    try {
+      const res = await createDepartment({
+        name: deptName,
+        parentDepartment: deptParent,
+        head: deptHead,
+      });
+      if (res && res.success) {
+        setShowDeptModal(false);
+        setDeptName("");
+      } else {
+        alert(res?.message || "Failed to create department");
+      }
+    } catch (err) {
+      alert(err.message || "An error occurred");
+    }
   };
 
-  const handleDeleteDepartment = (id, name) => {
+  const handleDeleteDepartment = async (id, name) => {
     if (!isAdmin) return;
-    setDepartments((prev) => prev.filter((d) => d.id !== id));
-    createActivityLog({ action: "Deleted Department", entity: name, metadata: "Removed from directory" });
+    if (window.confirm(`Are you sure you want to delete department: ${name}?`)) {
+      try {
+        const res = await deleteDepartment(id);
+        if (res && !res.success) {
+          alert(res.message || "Failed to delete department");
+        }
+      } catch (err) {
+        alert(err.message || "An error occurred");
+      }
+    }
   };
 
-  const handleCreateCategory = (e) => {
+  const handleCreateCategory = async (e) => {
     e.preventDefault();
     if (!catName || !catCode) return;
-    const newCat = {
-      id: "cat-" + Date.now(),
-      name: catName,
-      code: catCode.toUpperCase(),
-      description: `Custom category: ${catName}`,
-      metadataSchema: [
-        { key: catMetaKey1 || "Field 1", type: "string", example: catMetaExample1 || "Example 1" },
-        { key: catMetaKey2 || "Field 2", type: "string", example: catMetaExample2 || "Example 2" },
-      ],
-    };
-    setCategories((prev) => [...prev, newCat]);
-    createActivityLog({ action: "Created Category", entity: catName, metadata: `Code: ${catCode} with custom metadata` });
-    setShowCatModal(false);
-    setCatName("");
-    setCatCode("");
+    try {
+      const res = await createCategory({
+        name: catName,
+        code: catCode.toUpperCase(),
+        description: `Custom category: ${catName}`,
+        metadataSchema: [
+          { key: catMetaKey1 || "Field 1", type: "string", example: catMetaExample1 || "Example 1" },
+          { key: catMetaKey2 || "Field 2", type: "string", example: catMetaExample2 || "Example 2" },
+        ],
+      });
+      if (res && res.success) {
+        setShowCatModal(false);
+        setCatName("");
+        setCatCode("");
+      } else {
+        alert(res?.message || "Failed to create category");
+      }
+    } catch (err) {
+      alert(err.message || "An error occurred");
+    }
   };
 
-  const handleDeleteCategory = (id, name) => {
-    setCategories((prev) => prev.filter((c) => c.id !== id));
-    createActivityLog({ action: "Deleted Category", entity: name, metadata: "Removed schema" });
+  const handleDeleteCategory = async (id, name) => {
+    if (window.confirm(`Are you sure you want to delete category: ${name}?`)) {
+      try {
+        const res = await deleteCategory(id);
+        if (res && !res.success) {
+          alert(res.message || "Failed to delete category");
+        }
+      } catch (err) {
+        alert(err.message || "An error occurred");
+      }
+    }
   };
 
   return (
@@ -102,7 +136,7 @@ export const Screen3_OrgSetup = () => {
       <div className="page-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
-            <span className="badge badge-coral">MODULE 2 • ORG & RBAC</span>
+            <span className="badge badge-coral">ORG & RBAC</span>
             <span className="badge badge-neutral">Hierarchy & Directory</span>
           </div>
           <h1 className="page-title">Organization Architecture & Setup</h1>

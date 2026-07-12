@@ -85,9 +85,16 @@ app.use("/api/assets", assetRoutes);
 // Allocation & Transfers
 const allocationRoutes = require("./routes/allocation.routes");
 app.use("/api/allocations", allocationRoutes);
+app.use("/api/allocation", allocationRoutes);
 
 const transferRoutes = require("./routes/transfer.routes");
 app.use("/api/transfers", transferRoutes);
+app.use("/api/transfer", transferRoutes);
+
+const allocationController = require("./controllers/allocation.controller");
+const { protect: authProtect } = require("./middleware/auth.middleware");
+const { authorize: roleAuthorize } = require("./middleware/role.middleware");
+app.post("/api/return", authProtect, roleAuthorize("ADMIN", "ASSET_MANAGER", "DEPARTMENT_HEAD"), allocationController.returnAssetByAssetId);
 
 // Booking
 const bookingRoutes = require("./routes/booking.routes");

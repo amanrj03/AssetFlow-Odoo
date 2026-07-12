@@ -3,7 +3,7 @@ const generateAssetTag = require("../utils/generateAssetTag");
 const generateQRCode = require("../utils/generateQRCode");
 const { uploadBuffer } = require("../utils/cloudinaryUpload");
 
-const getAssets = async ({ search, status, categoryId, departmentId, page = 1, limit = 10, sort }) => {
+const getAssets = async ({ search, status, categoryId, departmentId, employeeId, page = 1, limit = 10, sort }) => {
   const skip = (page - 1) * limit;
   const take = parseInt(limit);
 
@@ -19,6 +19,15 @@ const getAssets = async ({ search, status, categoryId, departmentId, page = 1, l
 
   if (departmentId) {
     where.departmentId = departmentId;
+  }
+
+  if (employeeId) {
+    where.allocations = {
+      some: {
+        employeeId: employeeId,
+        status: "ACTIVE"
+      }
+    };
   }
 
   if (search) {

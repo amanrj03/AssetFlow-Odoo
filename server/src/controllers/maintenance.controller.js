@@ -1,3 +1,4 @@
+const prisma = require("../config/db");
 const maintenanceService = require("../services/maintenance.service");
 const {
   createMaintenanceSchema,
@@ -7,12 +8,25 @@ const {
 const { sendSuccess } = require("../utils/response");
 const asyncHandler = require("../utils/asyncHandler");
 
+const isUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
 const getMaintenanceRequests = asyncHandler(async (req, res) => {
   const { assetId, status, page, limit } = req.query;
+
+  let departmentId = undefined;
+  let raisedById = undefined;
+
+  if (req.user.role === "DEPARTMENT_HEAD") {
+    departmentId = req.user.departmentId;
+  } else if (req.user.role === "EMPLOYEE") {
+    raisedById = req.user.id;
+  }
 
   const result = await maintenanceService.getMaintenanceRequests({
     assetId,
     status,
+    departmentId,
+    raisedById,
     page: page ? parseInt(page) : 1,
     limit: limit ? parseInt(limit) : 10,
   });
@@ -27,7 +41,20 @@ const getMaintenanceById = asyncHandler(async (req, res) => {
 });
 
 const createMaintenanceRequest = asyncHandler(async (req, res) => {
-  const parsedData = createMaintenanceSchema.parse(req.body);
+  let assetId = req.body.assetId;
+  if (assetId && !isUUID(assetId)) {
+    const assetObj = await prisma.asset.findFirst({
+      where: { assetTag: assetId }
+    });
+    assetId = assetObj ? assetObj.id : null;
+  }
+
+  const resolvedBody = {
+    ...req.body,
+    assetId
+  };
+
+  const parsedData = createMaintenanceSchema.parse(resolvedBody);
   const request = await maintenanceService.createMaintenanceRequest(parsedData, req.user.id, req.user.role);
   return sendSuccess(res, "Maintenance request submitted successfully", { request }, 201);
 });

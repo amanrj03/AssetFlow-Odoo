@@ -99,6 +99,9 @@ class ApiService {
   getNotifications() { return this.request("/notifications"); }
   markNotificationRead(id) { return this.request(`/notifications/${id}/read`, { method: "PATCH" }); }
   markAllNotificationsRead() { return this.request("/notifications/read-all", { method: "PATCH" }); }
+
+  // Activity Logs Routes
+  getActivityLogs() { return this.request("/activity-logs"); }
 }
 
 export const api = new ApiService();

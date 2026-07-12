@@ -22,8 +22,8 @@ import {
 export const Screen1_Auth = ({ onLaunchERP, setShowLanding }) => {
   const { login, signup, switchRole, continueAsGuest, demoUsersList } = useAuth();
   const [isLogin, setIsLogin] = useState(() => (window.location.pathname || "/login").toLowerCase() !== "/signup");
-  const [email, setEmail] = useState("admin@assetflow.enterprise");
-  const [password, setPassword] = useState("12345678");
+  const [email, setEmail] = useState("admin@assetflow.com");
+  const [password, setPassword] = useState("password123");
   const [name, setName] = useState("Aman Verma");
 
   useEffect(() => {
@@ -129,7 +129,7 @@ export const Screen1_Auth = ({ onLaunchERP, setShowLanding }) => {
           <span style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 800, fontSize: "1.4rem", letterSpacing: "-0.03em", color: "var(--text-main)" }}>
             AssetFlow
           </span>
-          <span className="badge badge-coral" style={{ fontSize: "0.68rem" }}>Screen 1 Auth</span>
+          <span className="badge badge-coral" style={{ fontSize: "0.68rem" }}>Security Gate</span>
         </div>
       </header>
 
@@ -137,9 +137,9 @@ export const Screen1_Auth = ({ onLaunchERP, setShowLanding }) => {
       <div style={{ maxWidth: "1280px", margin: "32px auto 80px auto", padding: "0 24px", display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "48px", alignItems: "center", position: "relative", zIndex: 10 }}>
         {/* Left Column: Brand Specifications & Quick Role Tester */}
         <div style={{ paddingRight: "16px" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 16px", borderRadius: "99px", background: "rgba(224, 82, 48, 0.12)", border: "1px solid rgba(224, 82, 48, 0.35)", color: "var(--coral)", fontSize: "0.82rem", fontWeight: 700, marginBottom: "22px" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 16px", borderRadius: "99px", background: "rgba(79, 70, 229, 0.12)", border: "1px solid rgba(79, 70, 229, 0.35)", color: "var(--primary)", fontSize: "0.82rem", fontWeight: 700, marginBottom: "22px" }}>
             <Sparkles size={16} />
-            <span>SCREEN 1 • AUTHENTICATION & ROLE ARCHITECTURE</span>
+            <span>AUTHENTICATION & SECURITY GATEWAY</span>
           </div>
 
           <h1
@@ -179,7 +179,7 @@ export const Screen1_Auth = ({ onLaunchERP, setShowLanding }) => {
                     type="button"
                     onClick={() => {
                       setEmail(u.email);
-                      setPassword("12345678");
+                      setPassword("password123");
                       setIsLogin(true);
                       setError("");
                     }}
@@ -248,7 +248,7 @@ export const Screen1_Auth = ({ onLaunchERP, setShowLanding }) => {
               type="button"
               onClick={() => {
                 if (continueAsGuest) continueAsGuest();
-                else login("admin@assetflow.enterprise", "12345678");
+                else login("admin@assetflow.com", "password123");
                 setTimeout(() => {
                   if (onLaunchERP) onLaunchERP("dashboard");
                   else if (setShowLanding) setShowLanding(false);
