@@ -21,7 +21,7 @@ const signup = asyncHandler(async (req, res) => {
   return sendSuccess(
     res,
     Messages.AUTH.SIGNUP_SUCCESS,
-    { user },
+    { user, token },
     201
   );
 });
@@ -36,7 +36,7 @@ const login = asyncHandler(async (req, res) => {
   return sendSuccess(
     res,
     Messages.AUTH.LOGIN_SUCCESS,
-    { user },
+    { user, token },
     200
   );
 });

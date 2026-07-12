@@ -16,9 +16,10 @@ class ApiService {
   }
 
   async request(endpoint, options = {}) {
+    const hasValidToken = this.token && this.token !== "undefined" && this.token !== "null";
     const headers = {
       "Content-Type": "application/json",
-      ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      ...(hasValidToken ? { Authorization: `Bearer ${this.token}` } : {}),
       ...options.headers,
     };
 
@@ -26,6 +27,7 @@ class ApiService {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
         headers,
+        credentials: "include",
       });
       const data = await response.json();
       if (!response.ok) {
