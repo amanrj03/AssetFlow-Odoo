@@ -20,18 +20,26 @@ import {
 
 export const Screen6_Booking = () => {
   const { user } = useAuth();
-  const { bookings, fetchBookings, createBooking, deleteBooking } = useERP();
+  const { bookings, assets, fetchBookings, fetchAssets, createBooking, deleteBooking } = useERP();
 
   React.useEffect(() => {
     fetchBookings();
+    fetchAssets();
   }, []);
 
   const [showAddModal, setShowAddModal] = useState(false);
-  const [resource, setResource] = useState("Conference Room A (Executive Suite)");
+  const [resource, setResource] = useState("");
   const [employee, setEmployee] = useState(user?.name || "Aman Verma");
   const [start, setStart] = useState("2026-07-13T10:00");
   const [end, setEnd] = useState("2026-07-13T11:30");
   const [notes, setNotes] = useState("Engineering Sprint Planning & Demo");
+
+  React.useEffect(() => {
+    const bookable = assets.filter((a) => a.isBookable || a.shared);
+    if (bookable.length > 0 && !resource) {
+      setResource(bookable[0].name);
+    }
+  }, [assets, resource]);
 
   // Conflict rejection notification alert
   const [conflictMsg, setConflictMsg] = useState(null);
@@ -265,7 +273,8 @@ export const Screen6_Booking = () => {
         <button
           className="btn btn-secondary btn-sm"
           onClick={() => {
-            setResource("Conference Room A (Executive Suite)");
+            const bookableRoom = assets.find((a) => (a.isBookable || a.shared) && a.name.toLowerCase().includes("room"));
+            setResource(bookableRoom ? bookableRoom.name : "Conference Room Alpha");
             setStart("2026-07-12T13:30");
             setEnd("2026-07-12T14:00");
             setShowAddModal(true);
@@ -288,10 +297,14 @@ export const Screen6_Booking = () => {
               <div>
                 <label className="form-label">Resource to Book</label>
                 <select className="form-select" value={resource} onChange={(e) => setResource(e.target.value)}>
-                  <option value="Conference Room A (Executive Suite)">Conference Room A (Executive Suite)</option>
-                  <option value="Conference Room B (Ideation Lab)">Conference Room B (Ideation Lab)</option>
-                  <option value="Sony 4K Laser Projector VPL-XWZ">Sony 4K Laser Projector VPL-XWZ</option>
-                  <option value="Tesla Model Y Long Range (Logistics Fleet)">Tesla Model Y Long Range (Logistics Fleet)</option>
+                  {assets.filter((a) => a.isBookable || a.shared).map((a) => (
+                    <option key={a.id} value={a.name}>
+                      {a.name} ({a.location})
+                    </option>
+                  ))}
+                  {assets.filter((a) => a.isBookable || a.shared).length === 0 && (
+                    <option value="">No bookable resources found</option>
+                  )}
                 </select>
               </div>
 

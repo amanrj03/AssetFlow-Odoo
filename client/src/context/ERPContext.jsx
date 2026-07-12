@@ -463,8 +463,25 @@ export const ERPProvider = ({ children }) => {
     return res;
   };
 
-  const createBooking = async ({ assetId, startTime, endTime, purpose }) => {
-    const res = await api.createBooking({ assetId, startTime, endTime, purpose });
+  const createBooking = async (bookingData) => {
+    let resolvedAssetId = bookingData.assetId;
+    if (!resolvedAssetId && bookingData.resource) {
+      const match = assets.find((a) => a.name === bookingData.resource || a.tag === bookingData.resource);
+      resolvedAssetId = match ? match.id : null;
+    }
+
+    const resolvedStartTime = bookingData.startTime || bookingData.start;
+    const resolvedEndTime = bookingData.endTime || bookingData.end;
+    const resolvedPurpose = bookingData.purpose || bookingData.notes || "Resource Reservation";
+
+    const payload = {
+      assetId: resolvedAssetId,
+      startTime: resolvedStartTime,
+      endTime: resolvedEndTime,
+      purpose: resolvedPurpose,
+    };
+
+    const res = await api.createBooking(payload);
     if (res && res.success) {
       await fetchBookings();
     }
