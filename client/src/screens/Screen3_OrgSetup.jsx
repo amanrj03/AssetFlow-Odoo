@@ -211,18 +211,21 @@ export const Screen3_OrgSetup = () => {
                 </tr>
               </thead>
               <tbody>
-                {departments.map((d) => (
-                  <tr key={d.id}>
-                    <td style={{ fontWeight: 600 }}>{d.name}</td>
-                    <td style={{ color: "var(--text-secondary)" }}>{d.parentDepartment}</td>
-                    <td>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <div style={{ width: "26px", height: "26px", borderRadius: "50%", background: "var(--primary-light)", color: "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", fontWeight: 700 }}>
-                          {d.head.charAt(0)}
+                {departments.map((d) => {
+                  const parentName = d.parentDepartment && typeof d.parentDepartment === "object" ? d.parentDepartment.name : d.parentDepartment;
+                  const headName = d.head && typeof d.head === "object" ? d.head.name : d.head;
+                  return (
+                    <tr key={d.id}>
+                      <td style={{ fontWeight: 600 }}>{d.name}</td>
+                      <td style={{ color: "var(--text-secondary)" }}>{parentName || "None"}</td>
+                      <td>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <div style={{ width: "26px", height: "26px", borderRadius: "50%", background: "var(--primary-light)", color: "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", fontWeight: 700 }}>
+                            {headName ? headName.charAt(0) : "?"}
+                          </div>
+                          <span>{headName || "No Head Assigned"}</span>
                         </div>
-                        <span>{d.head}</span>
-                      </div>
-                    </td>
+                      </td>
                     <td><span className="badge badge-purple">{d.assetCount} assets</span></td>
                     <td>
                       <span className={`badge ${d.status === "ACTIVE" ? "badge-success" : "badge-danger"}`}>
@@ -242,7 +245,7 @@ export const Screen3_OrgSetup = () => {
                       </td>
                     )}
                   </tr>
-                ))}
+                )})}
               </tbody>
             </table>
           </div>
