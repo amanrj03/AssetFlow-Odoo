@@ -167,6 +167,15 @@ export const ERPProvider = ({ children }) => {
     return res;
   };
 
+  const assignDepartmentHead = async (id, headId) => {
+    const res = await api.assignDepartmentHead(id, headId);
+    if (res && res.success) {
+      await fetchDepartments();
+      await fetchEmployees(); // Fetch employees to reflect updated roles!
+    }
+    return res;
+  };
+
   const createCategory = async (catData) => {
     const res = await api.createCategory(catData);
     if (res && res.success) {
@@ -400,6 +409,7 @@ export const ERPProvider = ({ children }) => {
         createDepartment,
         updateDepartment,
         deleteDepartment,
+        assignDepartmentHead,
         createCategory,
         updateCategory,
         deleteCategory,

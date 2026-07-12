@@ -53,6 +53,7 @@ class ApiService {
   getDepartments() { return this.request("/departments"); }
   createDepartment(data) { return this.request("/departments", { method: "POST", body: JSON.stringify(data) }); }
   updateDepartment(id, data) { return this.request(`/departments/${id}`, { method: "PUT", body: JSON.stringify(data) }); }
+  assignDepartmentHead(id, headId) { return this.request(`/departments/${id}/head`, { method: "PATCH", body: JSON.stringify({ headId }) }); }
   deleteDepartment(id) { return this.request(`/departments/${id}`, { method: "DELETE" }); }
 
   // Categories Routes

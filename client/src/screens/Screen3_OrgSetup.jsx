@@ -27,6 +27,7 @@ export const Screen3_OrgSetup = () => {
     fetchEmployees,
     createDepartment,
     deleteDepartment,
+    assignDepartmentHead,
     createCategory,
     deleteCategory,
     promoteEmployee,
@@ -229,7 +230,35 @@ export const Screen3_OrgSetup = () => {
                           <div style={{ width: "26px", height: "26px", borderRadius: "50%", background: "var(--primary-light)", color: "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", fontWeight: 700 }}>
                             {headName ? headName.charAt(0) : "?"}
                           </div>
-                          <span>{headName || "No Head Assigned"}</span>
+                          {isAdmin ? (
+                            <select
+                              value={d.headId || ""}
+                              onChange={async (e) => {
+                                const selectedHeadId = e.target.value;
+                                if (selectedHeadId) {
+                                  try {
+                                    const res = await assignDepartmentHead(d.id, selectedHeadId);
+                                    if (res && !res.success) {
+                                      alert(res.message || "Failed to assign head");
+                                    }
+                                  } catch (err) {
+                                    alert(err.message || "Failed to assign head");
+                                  }
+                                }
+                              }}
+                              className="form-select"
+                              style={{ padding: "4px 8px", fontSize: "0.85rem", width: "fit-content", minWidth: "160px", background: "none", border: "1px solid var(--border-color)", borderRadius: "8px", cursor: "pointer" }}
+                            >
+                              <option value="">-- No Head Assigned --</option>
+                              {employees.map((emp) => (
+                                <option key={emp.id} value={emp.id}>
+                                  {emp.name} ({emp.role})
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <span>{headName || "No Head Assigned"}</span>
+                          )}
                         </div>
                       </td>
                     <td><span className="badge badge-purple">{d.assetCount} assets</span></td>
