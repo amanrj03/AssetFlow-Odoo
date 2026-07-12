@@ -53,8 +53,8 @@ const employeeRoutes = require("./routes/employee.routes");
 app.use("/api/employees", employeeRoutes);
 
 // Assets
-// const assetRoutes = require("./routes/asset.routes");
-// app.use("/api/assets", assetRoutes);
+const assetRoutes = require("./routes/asset.routes");
+app.use("/api/assets", assetRoutes);
 
 // Allocation
 // const allocationRoutes = require("./routes/allocation.routes");
