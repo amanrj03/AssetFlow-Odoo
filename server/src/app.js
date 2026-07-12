@@ -56,9 +56,12 @@ app.use("/api/employees", employeeRoutes);
 const assetRoutes = require("./routes/asset.routes");
 app.use("/api/assets", assetRoutes);
 
-// Allocation
-// const allocationRoutes = require("./routes/allocation.routes");
-// app.use("/api/allocation", allocationRoutes);
+// Allocation & Transfers
+const allocationRoutes = require("./routes/allocation.routes");
+app.use("/api/allocations", allocationRoutes);
+
+const transferRoutes = require("./routes/transfer.routes");
+app.use("/api/transfers", transferRoutes);
 
 // Booking
 // const bookingRoutes = require("./routes/booking.routes");
@@ -101,5 +104,9 @@ app.use((req, res) => {
 
 const errorMiddleware = require("./middleware/error.middleware");
 app.use(errorMiddleware);
+
+// Start Background Cron Jobs
+const startOverdueCron = require("./cron/overdueCron");
+startOverdueCron();
 
 module.exports = app;
