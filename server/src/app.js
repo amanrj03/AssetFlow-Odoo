@@ -30,6 +30,10 @@ app.get("/", (req, res) => {
   });
 });
 
+// Swagger Documentation
+const setupSwagger = require("./config/swagger");
+setupSwagger(app);
+
 /*
 |--------------------------------------------------------------------------
 | API Routes

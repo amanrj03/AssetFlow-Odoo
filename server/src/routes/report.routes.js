@@ -5,6 +5,7 @@ const { protect } = require("../middleware/auth.middleware");
 const { authorize } = require("../middleware/role.middleware");
 
 // Reports are restricted to ADMIN and ASSET_MANAGER roles
+router.get("/assets", protect, authorize("ADMIN", "ASSET_MANAGER"), reportController.getAssetUtilization);
 router.get("/asset-utilization", protect, authorize("ADMIN", "ASSET_MANAGER"), reportController.getAssetUtilization);
 router.get("/maintenance", protect, authorize("ADMIN", "ASSET_MANAGER"), reportController.getMaintenanceReport);
 router.get("/bookings", protect, authorize("ADMIN", "ASSET_MANAGER"), reportController.getBookingReport);
