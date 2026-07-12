@@ -31,7 +31,7 @@ const getRouteStateFromPath = (path = "") => {
 };
 
 function MainERPContent() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const initialRoute = getRouteStateFromPath();
   const [activeTab, setActiveTab] = useState(initialRoute.activeTab);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
@@ -48,6 +48,13 @@ function MainERPContent() {
       window.history.pushState(null, "", targetPath);
     }
   }, [activeTab, showLanding]);
+
+  // Redirect to login if user is unauthenticated after loading finishes
+  useEffect(() => {
+    if (!loading && !user && !showLanding && activeTab !== "auth") {
+      setActiveTab("auth");
+    }
+  }, [loading, user, showLanding, activeTab]);
 
   // Handle browser Back / Forward popstate navigation
   useEffect(() => {
@@ -68,6 +75,20 @@ function MainERPContent() {
     setActiveTab(tabId);
     setShowLanding(false);
   };
+
+  // If loading session restore
+  if (loading) {
+    return (
+      <div className="insighthub-grid-bg" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-main)", fontFamily: "'Inter', sans-serif" }}>
+        <div className="aceternity-spotlight" />
+        <div style={{ textAlign: "center", zIndex: 10 }}>
+          <div className="calendar-big-circle" style={{ margin: "0 auto 20px" }}>AF</div>
+          <div style={{ fontWeight: 800, fontSize: "1.2rem", color: "var(--text-main)" }}>Restoring secure session...</div>
+          <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginTop: "6px" }}>SOC 2 Compliance Gateways</div>
+        </div>
+      </div>
+    );
+  }
 
   // If showing landing page
   if (showLanding) {
