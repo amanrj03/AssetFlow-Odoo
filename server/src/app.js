@@ -49,8 +49,8 @@ app.get("/", (req, res) => {
 */
 
 // Authentication
-// const authRoutes = require("./routes/auth.routes");
-// app.use("/api/auth", authRoutes);
+const authRoutes = require("./routes/auth.routes");
+app.use("/api/auth", authRoutes);
 
 // Departments
 // const departmentRoutes = require("./routes/department.routes");
@@ -111,13 +111,7 @@ app.use((req, res) => {
 |--------------------------------------------------------------------------
 */
 
-app.use((err, req, res, next) => {
-  console.error(err);
-
-  res.status(err.statusCode || 500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
-});
+const errorMiddleware = require("./middleware/error.middleware");
+app.use(errorMiddleware);
 
 module.exports = app;
