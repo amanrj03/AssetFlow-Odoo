@@ -1,0 +1,416 @@
+{
+  "info": {
+    "_postman_id": "9a2f6b8f-3619-4fb5-9118-8f83e0c034a7",
+    "name": "AssetFlow ERP API",
+    "description": "API collection for AssetFlow Enterprise Resource Planning (ERP)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@gmail.com\",\n  \"password\": \"Password123!\",\n  \"name\": \"Jane Doe\",\n  \"employeeCode\": \"EMP100\"\n}"
+            },
+            "url": {
+              "raw": "{{host}}/api/auth/signup",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "signup"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@assetflow.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{host}}/api/auth/login",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/auth/me",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/auth/logout",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Departments",
+      "item": [
+        {
+          "name": "List Departments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/departments",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "departments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Department",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Engineering\",\n  \"description\": \"Software development and QA team\"\n}"
+            },
+            "url": {
+              "raw": "{{host}}/api/departments",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "departments"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/categories",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "categories"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Smartphones\",\n  \"description\": \"Mobile testing devices and communication handhelds\"\n}"
+            },
+            "url": {
+              "raw": "{{host}}/api/categories",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "categories"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Employees",
+      "item": [
+        {
+          "name": "List Employees",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/employees",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "employees"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Assets",
+      "item": [
+        {
+          "name": "List Assets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/assets",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "assets"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Register Asset",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"MacBook Pro M3\",\n  \"categoryId\": \"LAPTOP_CATEGORY_ID_HERE\",\n  \"departmentId\": \"DEPT_ID_HERE\",\n  \"serialNumber\": \"SN8892718\",\n  \"purchaseCost\": 2200,\n  \"location\": \"HQ Room 301\"\n}"
+            },
+            "url": {
+              "raw": "{{host}}/api/assets",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "assets"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Allocations",
+      "item": [
+        {
+          "name": "Checkout Asset (Allocate)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assetId\": \"ASSET_ID_HERE\",\n  \"employeeId\": \"EMPLOYEE_ID_HERE\",\n  \"notes\": \"Allocated for development project\"\n}"
+            },
+            "url": {
+              "raw": "{{host}}/api/allocations",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "allocations"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "List Bookings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/bookings",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "bookings"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/dashboard",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "dashboard"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Asset Utilization Report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/reports/asset-utilization",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "asset-utilization"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Export Assets CSV",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/reports/export?type=assets",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "export"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "assets"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{host}}/health",
+          "host": [
+            "{{host}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "host",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ]
+}

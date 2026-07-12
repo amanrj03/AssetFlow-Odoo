@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
+const prisma = require("./config/db");
+
 const app = express();
 
 app.use(
@@ -20,7 +22,6 @@ app.use(express.urlencoded({ extended: true }));
 // Parse Cookies
 app.use(cookieParser());
 
-
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
@@ -28,6 +29,27 @@ app.get("/", (req, res) => {
     version: "1.0.0",
     message: "Server is running successfully :rocket:",
   });
+});
+
+app.get("/health", async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.status(200).json({
+      success: true,
+      status: "UP",
+      database: "CONNECTED",
+      uptime: `${Math.floor(process.uptime())}s`,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      status: "DOWN",
+      database: "DISCONNECTED",
+      error: error.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 // Swagger Documentation
