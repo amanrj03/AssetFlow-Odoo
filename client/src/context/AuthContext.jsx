@@ -92,6 +92,7 @@ export const AuthProvider = ({ children }) => {
       if (res && res.success && res.data) {
         const token = res.data.token;
         const loggedInUser = res.data.user || res.data;
+        localStorage.setItem("assetflow_token", token);
         api.setToken(token);
         setUser(loggedInUser);
         return { success: true };
@@ -110,6 +111,7 @@ export const AuthProvider = ({ children }) => {
       if (res && res.success && res.data) {
         const token = res.data.token;
         const loggedInUser = res.data.user || res.data;
+        localStorage.setItem("assetflow_token", token);
         api.setToken(token);
         setUser(loggedInUser);
         return { success: true };
@@ -127,6 +129,7 @@ export const AuthProvider = ({ children }) => {
     } catch (e) {
       // Ignore
     }
+    localStorage.removeItem("assetflow_token");
     setUser(null);
     api.setToken(null);
   };
