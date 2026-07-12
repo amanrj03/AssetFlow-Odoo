@@ -40,7 +40,7 @@ export const Screen3_OrgSetup = () => {
   const [showDeptModal, setShowDeptModal] = useState(false);
   const [deptName, setDeptName] = useState("");
   const [deptParent, setDeptParent] = useState("Executive & Admin");
-  const [deptHead, setDeptHead] = useState("Vikram Malhotra");
+  const [deptHead, setDeptHead] = useState("");
 
   // New Category Form State
   const [showCatModal, setShowCatModal] = useState(false);
@@ -57,6 +57,12 @@ export const Screen3_OrgSetup = () => {
     fetchCategories();
     fetchEmployees();
   }, []);
+
+  React.useEffect(() => {
+    if (employees.length > 0 && !deptHead) {
+      setDeptHead(employees[0].name);
+    }
+  }, [employees, deptHead]);
 
   const handleCreateDepartment = async (e) => {
     e.preventDefault();
@@ -293,7 +299,7 @@ export const Screen3_OrgSetup = () => {
                       <Settings size={13} /> Custom Metadata Keys Supported (`POST /assets` check)
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                      {c.metadataSchema.map((field, idx) => (
+                      {(Array.isArray(c.metadataSchema) ? c.metadataSchema : (typeof c.metadataSchema === 'string' ? JSON.parse(c.metadataSchema) : [])).map((field, idx) => (
                         <div key={idx} style={{ padding: "6px 10px", borderRadius: "var(--radius-sm)", background: "var(--bg-surface-elevated)", border: "1px solid var(--border-color)", fontSize: "0.78rem" }}>
                           <strong style={{ color: "var(--text-main)" }}>{field.key}:</strong> <span style={{ color: "var(--text-muted)" }}>({field.example})</span>
                         </div>
@@ -350,7 +356,7 @@ export const Screen3_OrgSetup = () => {
                         {emp.role}
                       </span>
                     </td>
-                    <td>{emp.department}</td>
+                    <td>{emp.department && typeof emp.department === "object" ? emp.department.name : emp.department}</td>
                     <td>
                       <span className={`badge ${emp.status === "ACTIVE" ? "badge-success" : "badge-danger"}`}>
                         {emp.status}
@@ -435,14 +441,14 @@ export const Screen3_OrgSetup = () => {
 
               <div>
                 <label className="form-label">Department Head</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. Vikram Malhotra"
-                  value={deptHead}
-                  onChange={(e) => setDeptHead(e.target.value)}
-                  required
-                />
+                <select className="form-select" value={deptHead} onChange={(e) => setDeptHead(e.target.value)} required>
+                  {employees.map((emp) => (
+                    <option key={emp.id} value={emp.name}>
+                      {emp.name} ({emp.role})
+                    </option>
+                  ))}
+                  {employees.length === 0 && <option value="">No employees found</option>}
+                </select>
               </div>
 
               <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginTop: "10px" }}>

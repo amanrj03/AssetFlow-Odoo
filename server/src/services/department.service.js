@@ -342,10 +342,9 @@ const softDeleteDepartment = async (id, adminUserId) => {
     throw error;
   }
 
-  // 3. Mark inactive (soft delete)
-  await prisma.department.update({
+  // 3. Hard delete from database
+  await prisma.department.delete({
     where: { id },
-    data: { status: "INACTIVE" },
   });
 
   // 4. Activity Log
@@ -359,7 +358,7 @@ const softDeleteDepartment = async (id, adminUserId) => {
     },
   });
 
-  return { id, status: "INACTIVE" };
+  return { id, deleted: true };
 };
 
 module.exports = {
