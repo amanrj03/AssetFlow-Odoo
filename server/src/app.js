@@ -53,20 +53,23 @@ const employeeRoutes = require("./routes/employee.routes");
 app.use("/api/employees", employeeRoutes);
 
 // Assets
-// const assetRoutes = require("./routes/asset.routes");
-// app.use("/api/assets", assetRoutes);
+const assetRoutes = require("./routes/asset.routes");
+app.use("/api/assets", assetRoutes);
 
-// Allocation
-// const allocationRoutes = require("./routes/allocation.routes");
-// app.use("/api/allocation", allocationRoutes);
+// Allocation & Transfers
+const allocationRoutes = require("./routes/allocation.routes");
+app.use("/api/allocations", allocationRoutes);
+
+const transferRoutes = require("./routes/transfer.routes");
+app.use("/api/transfers", transferRoutes);
 
 // Booking
-// const bookingRoutes = require("./routes/booking.routes");
-// app.use("/api/bookings", bookingRoutes);
+const bookingRoutes = require("./routes/booking.routes");
+app.use("/api/bookings", bookingRoutes);
 
 // Maintenance
-// const maintenanceRoutes = require("./routes/maintenance.routes");
-// app.use("/api/maintenance", maintenanceRoutes);
+const maintenanceRoutes = require("./routes/maintenance.routes");
+app.use("/api/maintenance", maintenanceRoutes);
 
 // Audit
 // const auditRoutes = require("./routes/audit.routes");
@@ -101,5 +104,9 @@ app.use((req, res) => {
 
 const errorMiddleware = require("./middleware/error.middleware");
 app.use(errorMiddleware);
+
+// Start Background Cron Jobs
+const startOverdueCron = require("./cron/overdueCron");
+startOverdueCron();
 
 module.exports = app;
