@@ -128,7 +128,24 @@ export const ERPProvider = ({ children }) => {
     try {
       const res = await api.request("/transfers");
       if (res && res.success && res.data) {
-        setTransferRequests(res.data.transfers || res.data);
+        const rawTransfers = res.data.transfers || res.data;
+        const mapped = rawTransfers.map((req) => {
+          let statusStr = req.status;
+          if (req.status === "PENDING") statusStr = "Pending";
+          else if (req.status === "APPROVED") statusStr = "Approved";
+          else if (req.status === "REJECTED") statusStr = "Rejected";
+
+          return {
+            ...req,
+            assetTag: req.asset ? req.asset.assetTag : "N/A",
+            assetName: req.asset ? req.asset.name : "N/A",
+            from: req.fromEmployee ? req.fromEmployee.name : (req.from || "None"),
+            to: req.toEmployee ? req.toEmployee.name : (req.to || "None"),
+            status: statusStr,
+            approvedBy: req.approvedBy ? req.approvedBy.name : null,
+          };
+        });
+        setTransferRequests(mapped);
       }
     } catch (e) {
       console.error("fetchTransferRequests error:", e);
@@ -139,7 +156,28 @@ export const ERPProvider = ({ children }) => {
     try {
       const res = await api.getBookings();
       if (res && res.success && res.data) {
-        setBookings(res.data.bookings || res.data);
+        const rawBookings = res.data.bookings || res.data;
+        const mapped = rawBookings.map((bk) => {
+          let empName = "System";
+          if (bk.bookedBy) {
+            empName = typeof bk.bookedBy === "object" ? bk.bookedBy.name : bk.bookedBy;
+          } else if (bk.employee) {
+            empName = typeof bk.employee === "object" ? bk.employee.name : bk.employee;
+          }
+          
+          let statusStr = bk.status;
+          if (bk.status === "UPCOMING") statusStr = "Upcoming";
+          else if (bk.status === "ONGOING") statusStr = "Ongoing";
+          else if (bk.status === "COMPLETED") statusStr = "Completed";
+          else if (bk.status === "CANCELLED") statusStr = "Cancelled";
+
+          return {
+            ...bk,
+            employee: empName,
+            status: statusStr,
+          };
+        });
+        setBookings(mapped);
       }
     } catch (e) {
       console.error("fetchBookings error:", e);

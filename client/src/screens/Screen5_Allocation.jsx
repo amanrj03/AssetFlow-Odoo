@@ -22,8 +22,10 @@ export const Screen5_Allocation = () => {
   const {
     assets,
     transferRequests,
+    employees,
     fetchTransferRequests,
     fetchAssets,
+    fetchEmployees,
     processTransferRequest,
     allocateAsset,
     requestTransfer,
@@ -33,13 +35,14 @@ export const Screen5_Allocation = () => {
   React.useEffect(() => {
     fetchTransferRequests();
     fetchAssets();
+    fetchEmployees();
   }, []);
 
   const [activeTab, setActiveTab] = useState("transfers"); // "transfers" | "direct" | "returns"
   
   // Direct Allocation State (`POST /allocation`)
   const [selectedAssetId, setSelectedAssetId] = useState("");
-  const [targetUser, setTargetUser] = useState("Neha Singh");
+  const [targetUser, setTargetUser] = useState("");
   const [targetDept, setTargetDept] = useState("IT & Infrastructure");
   const [allocNotes, setAllocNotes] = useState("Project deployment assignment");
   const [allocError, setAllocError] = useState(null);
@@ -49,8 +52,15 @@ export const Screen5_Allocation = () => {
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [transferAssetId, setTransferAssetId] = useState("");
   const [transferFrom, setTransferFrom] = useState("");
-  const [transferTo, setTransferTo] = useState("Neha Singh (IT & Infrastructure)");
+  const [transferTo, setTransferTo] = useState("");
   const [transferReason, setTransferReason] = useState("Urgent project re-allocation for 2 weeks");
+
+  React.useEffect(() => {
+    if (employees.length > 0) {
+      if (!targetUser) setTargetUser(employees[0].name);
+      if (!transferTo) setTransferTo(employees[0].name);
+    }
+  }, [employees, targetUser, transferTo]);
 
   // Return Asset State (`POST /return`)
   const [showReturnModal, setShowReturnModal] = useState(false);
@@ -290,7 +300,14 @@ export const Screen5_Allocation = () => {
 
               <div>
                 <label className="form-label">Target Employee</label>
-                <input type="text" className="form-input" value={targetUser} onChange={(e) => setTargetUser(e.target.value)} required />
+                <select className="form-select" value={targetUser} onChange={(e) => setTargetUser(e.target.value)} required>
+                  {employees.map((emp) => (
+                    <option key={emp.id} value={emp.name}>
+                      {emp.name} ({emp.role})
+                    </option>
+                  ))}
+                  {employees.length === 0 && <option value="">No employees found</option>}
+                </select>
               </div>
 
               <div>
@@ -413,14 +430,14 @@ export const Screen5_Allocation = () => {
 
               <div>
                 <label className="form-label">To (Target Recipient / Department)</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. Neha Singh (IT & Infrastructure)"
-                  value={transferTo}
-                  onChange={(e) => setTransferTo(e.target.value)}
-                  required
-                />
+                <select className="form-select" value={transferTo} onChange={(e) => setTransferTo(e.target.value)} required>
+                  {employees.map((emp) => (
+                    <option key={emp.id} value={emp.name}>
+                      {emp.name} ({emp.role})
+                    </option>
+                  ))}
+                  {employees.length === 0 && <option value="">No employees found</option>}
+                </select>
               </div>
 
               <div>
