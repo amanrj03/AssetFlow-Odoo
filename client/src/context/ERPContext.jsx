@@ -74,7 +74,50 @@ export const ERPProvider = ({ children }) => {
     try {
       const res = await api.getAssets();
       if (res && res.success && res.data) {
-        setAssets(res.data.assets || res.data);
+        const rawAssets = res.data.assets || res.data;
+        const mapped = rawAssets.map((a) => {
+          let catName = "Electronics";
+          if (a.category) {
+            catName = typeof a.category === "object" ? a.category.name : a.category;
+          }
+
+          let deptName = "None";
+          if (a.department) {
+            deptName = typeof a.department === "object" ? a.department.name : a.department;
+          }
+
+          let conditionStr = "Good";
+          if (a.condition) {
+            if (a.condition === "EXCELLENT") conditionStr = "New";
+            else if (a.condition === "GOOD") conditionStr = "Good";
+            else if (a.condition === "FAIR" || a.condition === "POOR") conditionStr = "Needs Repair";
+            else conditionStr = a.condition;
+          }
+
+          let statusStr = "Available";
+          if (a.status) {
+            if (a.status === "AVAILABLE") statusStr = "Available";
+            else if (a.status === "ALLOCATED") statusStr = "Allocated";
+            else if (a.status === "UNDER_MAINTENANCE") statusStr = "Under Maintenance";
+            else if (a.status === "LOST" || a.status === "RETIRED") statusStr = "Lost";
+            else statusStr = a.status;
+          }
+
+          return {
+            ...a,
+            tag: a.assetTag || `AF-${a.id.substring(0, 4).toUpperCase()}`,
+            photo: a.imageUrl || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=150&auto=format&fit=crop&q=80",
+            category: catName,
+            department: deptName,
+            condition: conditionStr,
+            status: statusStr,
+            purchaseCost: a.purchaseCost || 0,
+            serialNumber: a.serialNumber || "N/A",
+            location: a.location || "N/A",
+            allocatedTo: a.allocations && a.allocations.length > 0 ? (a.allocations[0].employee ? a.allocations[0].employee.name : null) : null,
+          };
+        });
+        setAssets(mapped);
       }
     } catch (e) {
       console.error("fetchAssets error:", e);

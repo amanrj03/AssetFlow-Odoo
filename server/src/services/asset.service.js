@@ -56,6 +56,13 @@ const getAssets = async ({ search, status, categoryId, departmentId, employeeId,
       include: {
         category: { select: { id: true, name: true } },
         department: { select: { id: true, name: true } },
+        allocations: {
+          where: { status: "ACTIVE" },
+          take: 1,
+          include: {
+            employee: { select: { name: true } }
+          }
+        }
       },
     }),
   ]);
