@@ -49,8 +49,8 @@ const categoryRoutes = require("./routes/category.routes");
 app.use("/api/categories", categoryRoutes);
 
 // Employees
-// const employeeRoutes = require("./routes/employee.routes");
-// app.use("/api/employees", employeeRoutes);
+const employeeRoutes = require("./routes/employee.routes");
+app.use("/api/employees", employeeRoutes);
 
 // Assets
 // const assetRoutes = require("./routes/asset.routes");
