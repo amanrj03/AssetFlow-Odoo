@@ -188,7 +188,27 @@ export const ERPProvider = ({ children }) => {
     try {
       const res = await api.getMaintenances();
       if (res && res.success && res.data) {
-        setMaintenances(res.data.maintenances || res.data);
+        const rawReqs = res.data.requests || res.data.maintenances || (Array.isArray(res.data) ? res.data : []);
+        const mapped = rawReqs.map((m) => {
+          let prioStr = m.priority;
+          if (m.priority === "HIGH") prioStr = "High";
+          else if (m.priority === "MEDIUM") prioStr = "Medium";
+          else if (m.priority === "LOW") prioStr = "Low";
+
+          let statusStr = m.status;
+          if (m.status === "PENDING") statusStr = "Pending";
+          else if (m.status === "APPROVED") statusStr = "Approved";
+          else if (m.status === "ASSIGNED") statusStr = "Technician Assigned";
+          else if (m.status === "IN_PROGRESS") statusStr = "In Progress";
+          else if (m.status === "RESOLVED") statusStr = "Resolved";
+
+          return {
+            ...m,
+            priority: prioStr,
+            status: statusStr,
+          };
+        });
+        setMaintenances(mapped);
       }
     } catch (e) {
       console.error("fetchMaintenances error:", e);
