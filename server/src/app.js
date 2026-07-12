@@ -45,8 +45,8 @@ const departmentRoutes = require("./routes/department.routes");
 app.use("/api/departments", departmentRoutes);
 
 // Categories
-// const categoryRoutes = require("./routes/category.routes");
-// app.use("/api/categories", categoryRoutes);
+const categoryRoutes = require("./routes/category.routes");
+app.use("/api/categories", categoryRoutes);
 
 // Employees
 // const employeeRoutes = require("./routes/employee.routes");
