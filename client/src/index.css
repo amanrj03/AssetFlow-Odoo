@@ -7,12 +7,12 @@
   --bg-surface-elevated: #FFFFFF;
   --bg-surface-hover: #FFF7ED;
   --bg-glass: rgba(255, 255, 255, 0.95);
-  
+
   --bg-dark-card: #0F172A;
   --bg-coral-gradient: linear-gradient(135deg, #E05230 0%, #F97316 100%);
   --bg-peach-light: #FFF5F1;
   --bg-orange-light: #FFEDD5;
-  
+
   --border-color: #E2E8F0;
   --border-subtle: #F1F5F9;
   --border-focus: rgba(224, 82, 48, 0.5);
@@ -96,7 +96,14 @@ body {
   overflow-x: hidden;
 }
 
-h1, h2, h3, h4, h5, h6, .page-title, .bento-title {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.page-title,
+.bento-title {
   font-family: 'Outfit', sans-serif;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -228,7 +235,8 @@ h1, h2, h3, h4, h5, h6, .page-title, .bento-title {
 }
 
 /* Sub-Screen Tab Navigation Bars (`Sleek, un-cluttered rounded glass pills across all screens`) */
-.sub-pill-bar, .tabs-header {
+.sub-pill-bar,
+.tabs-header {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -252,7 +260,8 @@ h1, h2, h3, h4, h5, h6, .page-title, .bento-title {
   margin-bottom: 24px;
 }
 
-.tab-btn, .sub-pill-btn {
+.tab-btn,
+.sub-pill-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -269,12 +278,14 @@ h1, h2, h3, h4, h5, h6, .page-title, .bento-title {
   white-space: nowrap;
 }
 
-.tab-btn:hover, .sub-pill-btn:hover {
+.tab-btn:hover,
+.sub-pill-btn:hover {
   color: var(--coral);
   background: var(--bg-surface-hover);
 }
 
-.tab-btn.active, .sub-pill-btn.active {
+.tab-btn.active,
+.sub-pill-btn.active {
   background: var(--coral);
   color: #FFFFFF;
   font-weight: 700;
@@ -669,7 +680,9 @@ h1, h2, h3, h4, h5, h6, .page-title, .bento-title {
   background: var(--bg-peach-light);
 }
 
-.form-input, .form-select, .form-textarea {
+.form-input,
+.form-select,
+.form-textarea {
   width: 100%;
   padding: 8px 14px;
   border-radius: var(--radius-pill);
@@ -686,7 +699,9 @@ h1, h2, h3, h4, h5, h6, .page-title, .bento-title {
   border-radius: var(--radius-md);
 }
 
-.form-input:focus, .form-select:focus, .form-textarea:focus {
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
   border-color: var(--coral);
   box-shadow: 0 0 0 3px rgba(224, 82, 48, 0.14);
 }
@@ -730,7 +745,8 @@ h1, h2, h3, h4, h5, h6, .page-title, .bento-title {
   animation: fadeIn 0.2s ease-out;
 }
 
-.modal-content, .drawer-content {
+.modal-content,
+.drawer-content {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
@@ -744,18 +760,37 @@ h1, h2, h3, h4, h5, h6, .page-title, .bento-title {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleUp {
-  from { opacity: 0; transform: scale(0.96) translateY(8px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 15px rgba(224, 82, 48, 0.25); }
-  50% { box-shadow: 0 0 28px rgba(224, 82, 48, 0.45); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 15px rgba(224, 82, 48, 0.25);
+  }
+
+  50% {
+    box-shadow: 0 0 28px rgba(224, 82, 48, 0.45);
+  }
 }
 
 /* ========================================================================== */
@@ -826,7 +861,7 @@ h1, h2, h3, h4, h5, h6, .page-title, .bento-title {
   border-radius: 99px;
   margin-bottom: 28px;
   flex-wrap: wrap;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
 }
 
 .shadcn-tab-trigger {
@@ -933,7 +968,7 @@ h1, h2, h3, h4, h5, h6, .page-title, .bento-title {
 .insighthub-grid-bg {
   background-color: #F8FAFC;
   background-image: linear-gradient(to right, rgba(15, 23, 42, 0.045) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
   background-size: 64px 64px;
   position: relative;
   min-height: 100vh;
@@ -1036,6 +1071,7 @@ h1, h2, h3, h4, h5, h6, .page-title, .bento-title {
   .bento-grid {
     grid-template-columns: repeat(6, 1fr);
   }
+
   .bento-card {
     grid-column: span 6 !important;
   }
@@ -1048,6 +1084,7 @@ h1, h2, h3, h4, h5, h6, .page-title, .bento-title {
     gap: 10px;
     padding: 12px 16px;
   }
+
   .hero-greeting-row {
     flex-direction: column;
     align-items: flex-start;

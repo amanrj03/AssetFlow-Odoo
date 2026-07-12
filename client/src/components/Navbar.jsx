@@ -40,12 +40,12 @@ export const Navbar = ({ activeTab, setActiveTab, sidebarCollapsed, setSidebarCo
 
   const filteredSearchAssets = searchQuery.trim()
     ? assets.filter(
-        (a) =>
-          a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          a.tag.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          a.serialNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          a.category.toLowerCase().includes(searchQuery.toLowerCase())
-      ).slice(0, 5)
+      (a) =>
+        a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        a.tag.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        a.serialNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        a.category.toLowerCase().includes(searchQuery.toLowerCase())
+    ).slice(0, 5)
     : [];
 
   const navTabs = [
