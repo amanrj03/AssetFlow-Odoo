@@ -376,14 +376,28 @@ export const ERPProvider = ({ children }) => {
       payload = newAssetData;
       isMultipart = true;
     } else {
+      const matchingCat = categories.find((c) => c.name === newAssetData.category);
+      const catId = matchingCat ? matchingCat.id : newAssetData.categoryId;
+
+      const matchingDept = departments.find((d) => d.name === newAssetData.department);
+      const deptId = matchingDept ? matchingDept.id : newAssetData.departmentId;
+
+      let conditionEnum = "GOOD";
+      if (newAssetData.condition) {
+        if (newAssetData.condition === "New") conditionEnum = "EXCELLENT";
+        else if (newAssetData.condition === "Good") conditionEnum = "GOOD";
+        else if (newAssetData.condition === "Needs Repair") conditionEnum = "DAMAGED";
+      }
+
       payload = {
         name: newAssetData.name,
-        categoryId: newAssetData.categoryId,
-        departmentId: newAssetData.departmentId,
+        categoryId: catId,
+        departmentId: deptId,
         serialNumber: newAssetData.serialNumber,
         purchaseCost: parseFloat(newAssetData.purchaseCost || 0),
         location: newAssetData.location,
-        isBookable: newAssetData.isBookable || false,
+        condition: conditionEnum,
+        isBookable: newAssetData.isBookable || newAssetData.shared || false,
       };
     }
 
