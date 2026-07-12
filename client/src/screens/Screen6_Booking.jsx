@@ -94,6 +94,12 @@ export const Screen6_Booking = () => {
     }
   };
 
+  const formatTime = (timeVal) => {
+    if (!timeVal) return "";
+    const str = typeof timeVal === "string" ? timeVal : new Date(timeVal).toISOString();
+    return str.replace("T", " ").substring(0, 16);
+  };
+
   const getStatusBadge = (status) => {
     switch (status) {
       case "Upcoming": return "badge-info";
@@ -184,12 +190,12 @@ export const Screen6_Booking = () => {
                 <td style={{ fontWeight: 500 }}>{bk.employee?.name || bk.employee}</td>
                 <td>
                   <div style={{ fontFamily: "Fira Code", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                    {bk.startTime ? bk.startTime.replace("T", " ").substring(0, 16) : bk.start?.replace("T", " ")}
+                    {formatTime(bk.startTime || bk.start)}
                   </div>
                 </td>
                 <td>
                   <div style={{ fontFamily: "Fira Code", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                    {bk.endTime ? bk.endTime.replace("T", " ").substring(0, 16) : bk.end?.replace("T", " ")}
+                    {formatTime(bk.endTime || bk.end)}
                   </div>
                 </td>
                 <td>
