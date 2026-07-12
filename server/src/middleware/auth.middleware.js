@@ -1,8 +1,14 @@
+const prisma = require("../config/db");
+const { verifyToken } = require("../utils/jwt");
+const { sendError } = require("../utils/response");
+const Messages = require("../constants/messages");
+
 const protect = async (req, res, next) => {
   try {
-    let token;
+    let token = req.cookies?.token;
 
     if (
+      !token &&
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
     ) {
