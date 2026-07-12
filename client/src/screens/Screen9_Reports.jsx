@@ -67,7 +67,19 @@ export const Screen9_Reports = () => {
     }));
 
   // 5. Assets Nearing Retirement (`GET /reports/assets`)
-  const retirementAssets = assets.filter((a) => a.condition === "Needs Repair" || (a.purchaseDate && parseInt(a.purchaseDate.split("-")[0]) <= 2022));
+  const retirementAssets = assets.filter((a) => {
+    const isNeedsRepair = a.condition === "Needs Repair";
+    let isOld = false;
+    if (a.purchaseDate) {
+      try {
+        const dateStr = typeof a.purchaseDate === "string" ? a.purchaseDate : new Date(a.purchaseDate).toISOString();
+        isOld = parseInt(dateStr.split("-")[0]) <= 2022;
+      } catch (err) {
+        isOld = false;
+      }
+    }
+    return isNeedsRepair || isOld;
+  });
 
   // 6. Booking Heatmap Simulation (`GET /reports/bookings`)
   const heatmapDays = ["Mon (Jul 6)", "Tue (Jul 7)", "Wed (Jul 8)", "Thu (Jul 9)", "Fri (Jul 10)", "Sat (Jul 11)", "Sun (Jul 12)"];
