@@ -27,6 +27,12 @@ const getAuditCycles = async ({ page = 1, limit = 10 }) => {
       include: {
         createdBy: { select: { id: true, name: true } },
         department: { select: { id: true, name: true } },
+        auditItems: {
+          include: {
+            asset: { select: { id: true, name: true, assetTag: true, serialNumber: true } },
+            auditor: { select: { id: true, name: true, email: true } },
+          },
+        },
       },
     }),
   ]);

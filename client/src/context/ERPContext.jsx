@@ -199,7 +199,38 @@ export const ERPProvider = ({ children }) => {
     try {
       const res = await api.getAuditCycles();
       if (res && res.success && res.data) {
-        setAuditCycles(res.data.auditCycles || res.data);
+        const rawCycles = res.data.cycles || res.data.auditCycles || (Array.isArray(res.data) ? res.data : []);
+        const mapped = rawCycles.map((c) => {
+          let discReport = null;
+          if (c.discrepancyReport) {
+            try {
+              discReport = typeof c.discrepancyReport === "string" ? JSON.parse(c.discrepancyReport) : c.discrepancyReport;
+            } catch (err) {
+              discReport = null;
+            }
+          }
+
+          const items = (c.auditItems || []).map((item) => ({
+            assetId: item.assetId,
+            assetTag: item.asset ? item.asset.assetTag : "N/A",
+            assetName: item.asset ? item.asset.name : "N/A",
+            verification: item.status === "VERIFIED" ? "Verified" : (item.status === "MISSING" ? "Missing" : (item.status === "DAMAGED" ? "Damaged" : "Pending")),
+          }));
+
+          let statusStr = c.status;
+          if (c.status === "UPCOMING") statusStr = "Upcoming";
+          else if (c.status === "ACTIVE") statusStr = "Active";
+          else if (c.status === "CLOSED") statusStr = "Closed";
+
+          return {
+            ...c,
+            status: statusStr,
+            assignedAuditor: c.assignedAuditor || "Priya Sharma",
+            discrepancyReport: discReport,
+            items,
+          };
+        });
+        setAuditCycles(mapped);
       }
     } catch (e) {
       console.error("fetchAuditCycles error:", e);
